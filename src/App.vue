@@ -1,22 +1,33 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+  <div>Test</div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+
+import ForceGraph3D from '3d-force-graph';
+import NetworkData from './data/network-relations.json'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
-  }
+  
+  },
+  mounted () {
+    var graph = ForceGraph3D();
+    graph(this.$el)
+        .graphData(NetworkData)
+        .nodeAutoColorBy('user')
+        .nodeLabel(node => `${node.text}`)
+        .onNodeClick(node => window.open(`https://bl.ocks.org/${node.user}/${node.id}`, '_blank'));
+      }
 }
 </script>
 
 <style>
+html,body {
+  margin: 0;
+  padding: 0;
+}
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
