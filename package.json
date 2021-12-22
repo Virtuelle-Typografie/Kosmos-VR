@@ -10,7 +10,9 @@
   "dependencies": {
     "3d-force-graph": "^1.70.5",
     "core-js": "^3.6.5",
-    "vue": "^2.6.11"
+    "three": "^0.135.0",
+    "vue": "^2.6.11",
+    "vue-plugin-load-script": "^2.1.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",

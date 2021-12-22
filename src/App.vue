@@ -13,13 +13,25 @@ export default {
   
   },
   mounted () {
-    var graph = ForceGraph3D();
+    // Import THREEJS Scripts
+    let threeScript = document.createElement('script')
+    threeScript.setAttribute('src', '//unpkg.com/three')
+    document.head.appendChild(threeScript)
+
+    let rendererScript = document.createElement('script')
+    rendererScript.setAttribute('src', '//unpkg.com/three/examples/js/renderers/CSS2DRenderer.js')
+    document.head.appendChild(rendererScript)
+
+
+    var graph = ForceGraph3D({
+      
+    });
     graph(this.$el)
         .graphData(NetworkData)
-        .nodeAutoColorBy('user')
+        .nodeAutoColorBy('text')
         .nodeLabel(node => `${node.text}`)
-        .onNodeClick(node => window.open(`https://bl.ocks.org/${node.user}/${node.id}`, '_blank'));
-      }
+        .nodeThreeObjectExtend(true)
+    }
 }
 </script>
 
@@ -36,4 +48,13 @@ html,body {
   color: #2c3e50;
   margin-top: 60px;
 }
+
+.node-label {
+      font-size: 12px
+;
+      padding: 1px 4px;
+      border-radius: 4px;
+      background-color: rgba(0,0,0,0.5);
+      user-select: none;
+    }
 </style>
