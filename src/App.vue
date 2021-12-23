@@ -37,7 +37,7 @@ export default {
         .nodeLabel(node => `${node.text}`)
         .nodeResolution(0)
         .nodeVisibility(true)
-        .linkResolution(1)
+        .linkResolution(0)
         .nodeThreeObject(node => {
           const nodeEl = document.createElement('div');
           nodeEl.textContent = node.text;
