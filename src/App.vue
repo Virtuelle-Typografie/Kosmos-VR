@@ -27,7 +27,13 @@ export default {
     // console.log(CSS2DRenderer)
 
     var graph = ForceGraph3D({
-      extraRenderers: [ new CSS2DRenderer() ]
+      extraRenderers: [ new CSS2DRenderer() ],
+      rendererConfig: {
+        antialias: false,
+        depth: false,
+        powerPreference: "high-performance",
+        precision: "lowp"
+      }
     });
 
 
@@ -53,13 +59,13 @@ export default {
           textLOD.addLevel(new THREE.Object3D, 500)
 
 
-          const sphereGeometryFar = new THREE.SphereGeometry( 1, 5, 3 );
-          const sphereGeometryNear = new THREE.SphereGeometry( 1, 20, 15 );
+          const sphereGeometryFar = new THREE.SphereBufferGeometry( 1, 5, 3 );
+          const sphereGeometryNear = new THREE.SphereBufferGeometry( 1, 20, 15 );
           const sphereMaterial = new THREE.MeshBasicMaterial( {color: node.color } );
           const sphereFar = new THREE.Mesh( sphereGeometryFar, sphereMaterial );
           const sphereNear = new THREE.Mesh( sphereGeometryNear, sphereMaterial )
 
-          const planeGeometry = new THREE.PlaneGeometry( 2, 2 );
+          const planeGeometry = new THREE.PlaneBufferGeometry( 2, 2 );
           const planeMaterial = new THREE.MeshBasicMaterial( { color: node.color, side: THREE.DoubleSide } );
           const plane = new THREE.Mesh( planeGeometry, planeMaterial );
           // plane.quaternion.copy(Graph.camera().quaternion);
@@ -113,8 +119,8 @@ export default {
           // console.log(link)
         })
 
-        console.log(Graph.renderer())
-        console.log(VRButton)
+        console.log("Renderer", Graph.renderer())
+        // console.log(VRButton)
         this.$el.appendChild( VRButton.createButton( Graph.renderer() ) );
         Graph.renderer().xr.enabled = true;
 
