@@ -30,9 +30,9 @@ export default {
       extraRenderers: [ new CSS2DRenderer() ],
       rendererConfig: {
         antialias: false,
-        depth: false,
-        powerPreference: "high-performance",
-        precision: "lowp"
+        // depth: false,
+        // powerPreference: "high-performance",
+        // precision: "lowp"
       },
       controlType: "trackball"
     });
@@ -56,6 +56,8 @@ export default {
           const group = new THREE.Group()
           const textLOD = new THREE.LOD()
           const objectLOD = new THREE.LOD()
+
+          // Check for root node, to display this in a different shape
         
           const nodeEl = document.createElement('div');
           nodeEl.textContent = node.text;
