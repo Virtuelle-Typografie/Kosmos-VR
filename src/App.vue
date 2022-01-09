@@ -31,9 +31,6 @@ export default {
     });
 
 
-    var OBJECTS = {}
-
-
     // Declare Graph to be later used for Click handling
     const Graph = graph(this.$el)
         .graphData(NetworkData)
