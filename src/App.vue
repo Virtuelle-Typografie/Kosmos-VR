@@ -34,6 +34,7 @@ export default {
         powerPreference: "high-performance",
         precision: "lowp"
       },
+      controlType: "trackball"
     });
 
 
@@ -62,7 +63,7 @@ export default {
           nodeEl.className = 'node-label';
           const textElement = new CSS2DObject(nodeEl)
 
-          textLOD.addLevel(textElement, 100)
+          textLOD.addLevel(textElement, 200)
           textLOD.addLevel(new THREE.Object3D, 500)
 
           const sphereMaterial = new THREE.MeshBasicMaterial( {color: node.color } );
@@ -119,8 +120,14 @@ export default {
           )
           // console.log(link)
         })
-        
+        .onEngineStop(() => {
+          console.log("Engine has stopped calculating.")
+          console.log("SCENE:", Graph.scene())
 
+          Graph.scene.frustumCulled = false
+        })
+        
+        
 
         Graph.scene().fog = new THREE.Fog(0x000000, 100, 6000);
 
