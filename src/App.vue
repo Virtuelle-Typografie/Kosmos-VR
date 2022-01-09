@@ -33,9 +33,13 @@ export default {
         depth: false,
         powerPreference: "high-performance",
         precision: "lowp"
-      }
+      },
     });
 
+
+    const sphereGeometryFar = new THREE.SphereBufferGeometry( 1, 5, 3 );
+    const sphereGeometryNear = new THREE.SphereBufferGeometry( 1, 20, 15 );
+    const planeGeometry = new THREE.PlaneBufferGeometry( 2, 2 );
 
     // Declare Graph to be later used for Click handling
     const Graph = graph(this.$el)
@@ -44,6 +48,9 @@ export default {
         .enableNodeDrag(false)
         // .nodeLabel(node => `${node.text}`)
         .nodeVisibility(true)
+        .linkResolution(0)
+        .cooldownTicks(0)
+        .warmupTicks(60)
         .nodeThreeObject(node => {
           const group = new THREE.Group()
           const textLOD = new THREE.LOD()
@@ -58,22 +65,17 @@ export default {
           textLOD.addLevel(textElement, 100)
           textLOD.addLevel(new THREE.Object3D, 500)
 
-
-          const sphereGeometryFar = new THREE.SphereBufferGeometry( 1, 5, 3 );
-          const sphereGeometryNear = new THREE.SphereBufferGeometry( 1, 20, 15 );
           const sphereMaterial = new THREE.MeshBasicMaterial( {color: node.color } );
+          const planeMaterial = new THREE.MeshBasicMaterial( { color: node.color, side: THREE.DoubleSide } );
+
           const sphereFar = new THREE.Mesh( sphereGeometryFar, sphereMaterial );
           const sphereNear = new THREE.Mesh( sphereGeometryNear, sphereMaterial )
-
-          const planeGeometry = new THREE.PlaneBufferGeometry( 2, 2 );
-          const planeMaterial = new THREE.MeshBasicMaterial( { color: node.color, side: THREE.DoubleSide } );
           const plane = new THREE.Mesh( planeGeometry, planeMaterial );
           // plane.quaternion.copy(Graph.camera().quaternion);
 
-
-          objectLOD.addLevel(new THREE.Object3D, 1500)
+          objectLOD.addLevel(new THREE.Object3D, 750)
           objectLOD.addLevel(plane, 100)
-          objectLOD.addLevel(sphereFar, 50)
+          objectLOD.addLevel(sphereFar, 75)
           objectLOD.addLevel(sphereNear, 25)
 
           group.add(textLOD)
@@ -108,25 +110,23 @@ export default {
           // console.log(linkTarget)
 
           const distance = 10;
-          const distRatio = 1 + distance/Math.hypot(linkTarget.x, linkTarget.y, linkTarget.z);
+          const distRatio = 1 + distance / Math.hypot(linkTarget.x, linkTarget.y, linkTarget.z);
 
           Graph.cameraPosition(
             { x: linkTarget.x * distRatio, y: linkTarget.y * distRatio, z: linkTarget.z * distRatio }, // new position
             linkTarget, // lookAt ({ x, y, z })
             10000  // ms transition duration
           )
-
           // console.log(link)
         })
+        
 
-        console.log("Renderer", Graph.renderer())
+
+        Graph.scene().fog = new THREE.Fog(0x000000, 100, 6000);
+
         // console.log(VRButton)
         this.$el.appendChild( VRButton.createButton( Graph.renderer() ) );
         Graph.renderer().xr.enabled = true;
-
-
-        Graph.camera().far = 1000;
-        Graph.camera().updateProjectionMatrix();
     }
 }
 </script>
@@ -146,11 +146,12 @@ html,body {
 }
 
 .node-label {
-      font-family: 'Inter';
-      font-size: 11px;
-      padding: 1rem 1.5rem;
-      border-radius: 4px;
-      background-color: rgba(0,0,0,0.5);
-      user-select: none;
-    }
+  font-family: 'Inter';
+  position: absolute;
+  font-size: 11px;
+  padding: .25rem .45rem;
+  border-radius: 12px;
+  background-color: rgba(0,0,0,0.5);
+  user-select: none;
+}
 </style>
