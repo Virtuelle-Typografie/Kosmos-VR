@@ -10,45 +10,78 @@ import NetworkData from './data/network-relations.json'
 import * as THREE from 'three'
 // IMPORTANT TO IMPORT FROM JSM FILESET
 const {CSS2DRenderer, CSS2DObject} = require('three/examples/jsm/renderers/CSS2DRenderer') 
+import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
 
 export default {
   name: 'App',
   data() {
     return  {
-      LAST_CLICKED_NODE : String
+      LAST_CLICKED_NODE : String,
     }
   },
   components: {
     
   },
   mounted () {
-    console.log(THREE)
-    console.log(CSS2DRenderer)
+    // console.log(THREE)
+    // console.log(CSS2DRenderer)
 
     var graph = ForceGraph3D({
       extraRenderers: [ new CSS2DRenderer() ]
     });
+
+
+    var OBJECTS = {}
+
 
     // Declare Graph to be later used for Click handling
     const Graph = graph(this.$el)
         .graphData(NetworkData)
         .nodeAutoColorBy('text')
         .enableNodeDrag(false)
-        .nodeLabel(node => `${node.text}`)
-        .nodeResolution(0)
+        // .nodeLabel(node => `${node.text}`)
         .nodeVisibility(true)
-        .linkResolution(0)
         .nodeThreeObject(node => {
+          const group = new THREE.Group()
+          const textLOD = new THREE.LOD()
+          const objectLOD = new THREE.LOD()
+        
           const nodeEl = document.createElement('div');
           nodeEl.textContent = node.text;
           nodeEl.style.color = node.color;
           nodeEl.className = 'node-label';
-          return new CSS2DObject(nodeEl);
+          const textElement = new CSS2DObject(nodeEl)
+
+          textLOD.addLevel(textElement, 100)
+          textLOD.addLevel(new THREE.Object3D, 500)
+
+
+          const sphereGeometryFar = new THREE.SphereGeometry( 1, 5, 3 );
+          const sphereGeometryNear = new THREE.SphereGeometry( 1, 20, 15 );
+          const sphereMaterial = new THREE.MeshBasicMaterial( {color: node.color } );
+          const sphereFar = new THREE.Mesh( sphereGeometryFar, sphereMaterial );
+          const sphereNear = new THREE.Mesh( sphereGeometryNear, sphereMaterial )
+
+          const planeGeometry = new THREE.PlaneGeometry( 2, 2 );
+          const planeMaterial = new THREE.MeshBasicMaterial( { color: node.color, side: THREE.DoubleSide } );
+          const plane = new THREE.Mesh( planeGeometry, planeMaterial );
+          // plane.quaternion.copy(Graph.camera().quaternion);
+
+
+          objectLOD.addLevel(new THREE.Object3D, 1500)
+          objectLOD.addLevel(plane, 100)
+          objectLOD.addLevel(sphereFar, 50)
+          objectLOD.addLevel(sphereNear, 25)
+
+          group.add(textLOD)
+          group.add(objectLOD)
+
+          return group;
         })
-        .nodeThreeObjectExtend(true)
+        .nodeThreeObjectExtend(false)
         .onNodeClick(node => {
           // Aim at node from outside it
-          const distance = 40;
+          const distance = 10;
           const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
 
           // Set last clicked node
@@ -57,7 +90,7 @@ export default {
           Graph.cameraPosition(
             { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }, // new position
             node, // lookAt ({ x, y, z })
-            3000  // ms transition duration
+            10000  // ms transition duration
           )
         })
         .onLinkClick(link => {
@@ -69,19 +102,28 @@ export default {
           } 
 
           self.LAST_CLICKED_NODE = linkTarget.id
-          console.log(linkTarget)
+          // console.log(linkTarget)
 
-          const distance = 40;
+          const distance = 10;
           const distRatio = 1 + distance/Math.hypot(linkTarget.x, linkTarget.y, linkTarget.z);
 
           Graph.cameraPosition(
             { x: linkTarget.x * distRatio, y: linkTarget.y * distRatio, z: linkTarget.z * distRatio }, // new position
             linkTarget, // lookAt ({ x, y, z })
-            3000  // ms transition duration
+            10000  // ms transition duration
           )
 
-          console.log(link)
+          // console.log(link)
         })
+
+        console.log(Graph.renderer())
+        console.log(VRButton)
+        this.$el.appendChild( VRButton.createButton( Graph.renderer() ) );
+        Graph.renderer().xr.enabled = true;
+
+
+        Graph.camera().far = 1000;
+        Graph.camera().updateProjectionMatrix();
     }
 }
 </script>
@@ -102,8 +144,8 @@ html,body {
 
 .node-label {
       font-family: 'Inter';
-      font-size: 7px;
-      padding: 1px 4px;
+      font-size: 11px;
+      padding: 1rem 1.5rem;
       border-radius: 4px;
       background-color: rgba(0,0,0,0.5);
       user-select: none;
