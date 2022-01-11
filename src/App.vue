@@ -7,6 +7,8 @@
 import ForceGraph3D from '3d-force-graph';
 import NetworkData from './data/network-relations.json'
 
+import GLTFImporter from './utils/GLTFImporter'
+
 import * as THREE from 'three'
 // IMPORTANT TO IMPORT FROM JSM FILESET
 const {CSS2DRenderer, CSS2DObject} = require('three/examples/jsm/renderers/CSS2DRenderer') 
@@ -17,15 +19,33 @@ export default {
   data() {
     return  {
       LAST_CLICKED_NODE : String,
+      Graph: undefined,
+      object : undefined
     }
   },
-  components: {
-    
-  },
-  mounted () {
-    // console.log(THREE)
-    // console.log(CSS2DRenderer)
+  methods: {
+    addModelsToScene () {
+      this.Graph.nodeThreeObject(node => {
+        console.log("Node", node)
+        
+        const cube = this.object.clone()
 
+        const group = new THREE.Group()
+        // const objectLOD = new THREE.LOD()
+        // objectLOD.addLevel(this.object, 750)
+        group.add(cube)
+
+        return group;
+      })
+    }
+  },
+  created () {
+    GLTFImporter("cube.gltf").then((result) => {
+      this.object = result
+      this.addModelsToScene()
+    })
+  },
+  async mounted () {
     var graph = ForceGraph3D({
       extraRenderers: [ new CSS2DRenderer() ],
       rendererConfig: {
@@ -36,14 +56,14 @@ export default {
       },
       controlType: "trackball"
     });
-
+  
 
     const sphereGeometryFar = new THREE.SphereBufferGeometry( 1, 5, 3 );
-    const sphereGeometryNear = new THREE.SphereBufferGeometry( 1, 20, 15 );
+    // const sphereGeometryNear = new THREE.SphereBufferGeometry( 1, 20, 15 );
     const planeGeometry = new THREE.PlaneBufferGeometry( 2, 2 );
 
     // Declare Graph to be later used for Click handling
-    const Graph = graph(this.$el)
+    this.Graph = graph(this.$el)
         .graphData(NetworkData)
         .nodeAutoColorBy('text')
         .enableNodeDrag(false)
@@ -52,40 +72,39 @@ export default {
         .linkResolution(0)
         .cooldownTicks(0)
         .warmupTicks(60)
-        .nodeThreeObject(node => {
-          const group = new THREE.Group()
-          const textLOD = new THREE.LOD()
-          const objectLOD = new THREE.LOD()
+        // .nodeThreeObject(node => {
+        //   const group = new THREE.Group()
+        //   const textLOD = new THREE.LOD()
+        //   const objectLOD = new THREE.LOD()
 
-          // Check for root node, to display this in a different shape
+        //   // Check for root node, to display this in a different shape
         
-          const nodeEl = document.createElement('div');
-          nodeEl.textContent = node.text;
-          nodeEl.style.color = node.color;
-          nodeEl.className = 'node-label';
-          const textElement = new CSS2DObject(nodeEl)
+        //   const nodeEl = document.createElement('div');
+        //   nodeEl.textContent = node.text;
+        //   nodeEl.style.color = node.color;
+        //   nodeEl.className = 'node-label';
+        //   const textElement = new CSS2DObject(nodeEl)
 
-          textLOD.addLevel(textElement, 200)
-          textLOD.addLevel(new THREE.Object3D, 500)
+        //   textLOD.addLevel(textElement, 200)
+        //   textLOD.addLevel(new THREE.Object3D, 500)
 
-          const sphereMaterial = new THREE.MeshBasicMaterial( {color: node.color } );
-          const planeMaterial = new THREE.MeshBasicMaterial( { color: node.color, side: THREE.DoubleSide } );
+        //   const sphereMaterial = new THREE.MeshBasicMaterial( {color: node.color } );
+        //   const planeMaterial = new THREE.MeshBasicMaterial( { color: node.color, side: THREE.DoubleSide } );
 
-          const sphereFar = new THREE.Mesh( sphereGeometryFar, sphereMaterial );
-          const sphereNear = new THREE.Mesh( sphereGeometryNear, sphereMaterial )
-          const plane = new THREE.Mesh( planeGeometry, planeMaterial );
-          // plane.quaternion.copy(Graph.camera().quaternion);
+        //   const sphereFar = new THREE.Mesh( sphereGeometryFar, sphereMaterial );
+        //   // const sphereNear = new THREE.Mesh( sphereGeometryNear, sphereMaterial )
+        //   const plane = new THREE.Mesh( planeGeometry, planeMaterial );
+        //   // plane.quaternion.copy(Graph.camera().quaternion);
 
-          objectLOD.addLevel(new THREE.Object3D, 750)
-          objectLOD.addLevel(plane, 100)
-          objectLOD.addLevel(sphereFar, 75)
-          objectLOD.addLevel(sphereNear, 25)
+        //   objectLOD.addLevel(new THREE.Object3D, 750)
+        //   objectLOD.addLevel(plane, 100)
+        //   objectLOD.addLevel(sphereFar, 75)
 
-          group.add(textLOD)
-          group.add(objectLOD)
+        //   group.add(textLOD)
+        //   group.add(objectLOD)
 
-          return group;
-        })
+        //   return group;
+        // })
         .nodeThreeObjectExtend(false)
         .onNodeClick(node => {
           // Aim at node from outside it
@@ -95,7 +114,7 @@ export default {
           // Set last clicked node
           this.LAST_CLICKED_NODE = node.id
 
-          Graph.cameraPosition(
+          this.Graph.cameraPosition(
             { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }, // new position
             node, // lookAt ({ x, y, z })
             10000  // ms transition duration
@@ -115,7 +134,7 @@ export default {
           const distance = 10;
           const distRatio = 1 + distance / Math.hypot(linkTarget.x, linkTarget.y, linkTarget.z);
 
-          Graph.cameraPosition(
+          this.Graph.cameraPosition(
             { x: linkTarget.x * distRatio, y: linkTarget.y * distRatio, z: linkTarget.z * distRatio }, // new position
             linkTarget, // lookAt ({ x, y, z })
             10000  // ms transition duration
@@ -124,18 +143,17 @@ export default {
         })
         .onEngineStop(() => {
           console.log("Engine has stopped calculating.")
-          console.log("SCENE:", Graph.scene())
 
-          Graph.scene.frustumCulled = false
+          this.Graph.scene.frustumCulled = false
         })
         
         
 
-        Graph.scene().fog = new THREE.Fog(0x000000, 100, 6000);
+        this.Graph.scene().fog = new THREE.Fog(0x000000, 100, 6000);
 
         // console.log(VRButton)
-        this.$el.appendChild( VRButton.createButton( Graph.renderer() ) );
-        Graph.renderer().xr.enabled = true;
+        this.$el.appendChild( VRButton.createButton( this.Graph.renderer() ) );
+        this.Graph.renderer().xr.enabled = true;
     }
 }
 </script>
