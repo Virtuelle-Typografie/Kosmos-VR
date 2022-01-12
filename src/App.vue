@@ -20,27 +20,46 @@ export default {
     return  {
       LAST_CLICKED_NODE : String,
       Graph: undefined,
-      object : undefined
+      object : undefined,
+      planeGemetry : new THREE.PlaneBufferGeometry( 1, 1 ),
+      planeMaterial: new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide }),
+      plane: new THREE.Object3D()
     }
   },
   methods: {
     addModelsToScene () {
-      this.Graph.nodeThreeObject(() => {       
+      this.Graph.nodeThreeObject((node) => {       
         const cube = this.object.clone()
+        const plane = this.plane.clone()
 
         const group = new THREE.Group()
 
-        // cube.material.color.setHex(node.color)
-        // const objectLOD = new THREE.LOD()
-        // objectLOD.addLevel(this.object, 750)
-        group.add(cube)
+        const color = cube.material.color.clone()
+        color.setStyle(node.color)
+
+        cube.material.color = color
+        cube.material.metalness = 0;
+        cube.position.set(0,0,0)
+
+        plane.material.color = color
+
+        const objectLOD = new THREE.LOD()
+        
+
+        objectLOD.addLevel(plane, 200)
+        objectLOD.addLevel(cube, 100)
+        group.add(objectLOD)
 
         return group;
       })
+    },
+    overrideCameraSettings() {
+      this.Graph.camera().far = 1200
+      this.Graph.camera().updateProjectionMatrix()
     }
   },
   created () {
-    GLTFImporter("cube.gltf").then((result) => {
+    GLTFImporter("fractal.glb").then((result) => {
       this.object = result
       this.addModelsToScene()
     })
@@ -50,17 +69,18 @@ export default {
       extraRenderers: [ new CSS2DRenderer() ],
       rendererConfig: {
         antialias: false,
+        gammaOutput: true
         // depth: false,
         // powerPreference: "high-performance",
         // precision: "lowp"
       },
-      controlType: "trackball"
+      controlType: "orbit"
     });
   
 
     // const sphereGeometryFar = new THREE.SphereBufferGeometry( 1, 5, 3 );
     // const sphereGeometryNear = new THREE.SphereBufferGeometry( 1, 20, 15 );
-    // const planeGeometry = new THREE.PlaneBufferGeometry( 2, 2 );
+    
 
     // Declare Graph to be later used for Click handling
     this.Graph = graph(this.$el)
@@ -142,18 +162,25 @@ export default {
           // console.log(link)
         })
         .onEngineStop(() => {
+          this.overrideCameraSettings()
           console.log("Engine has stopped calculating.")
-
-          this.Graph.scene.frustumCulled = false
         })
-        
-        
 
-        this.Graph.scene().fog = new THREE.Fog(0x000000, 100, 6000);
+        this.plane = new THREE.Mesh( this.planeGemetry, this.planeMaterial );
+        
+        const light = new THREE.AmbientLight( 0x404040, 0.1); // soft white light
+        this.Graph.scene().add( light );
+
+        this.Graph.camera().far = 100
+        this.Graph.camera().updateProjectionMatrix();
+
+        this.Graph.scene().fog = new THREE.Fog(0x000000, 1100, 1250);
 
         // console.log(VRButton)
         this.$el.appendChild( VRButton.createButton( this.Graph.renderer() ) );
         this.Graph.renderer().xr.enabled = true;
+
+        console.log(this.Graph.camera())
     }
 }
 </script>
