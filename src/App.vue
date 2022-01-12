@@ -11,7 +11,7 @@ import GLTFImporter from './utils/GLTFImporter'
 
 import * as THREE from 'three'
 // IMPORTANT TO IMPORT FROM JSM FILESET
-const {CSS2DRenderer, CSS2DObject} = require('three/examples/jsm/renderers/CSS2DRenderer') 
+const {CSS2DRenderer/*, CSS2DObject*/} = require('three/examples/jsm/renderers/CSS2DRenderer') 
 import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
 
 export default {
@@ -25,12 +25,12 @@ export default {
   },
   methods: {
     addModelsToScene () {
-      this.Graph.nodeThreeObject(node => {
-        console.log("Node", node)
-        
+      this.Graph.nodeThreeObject(() => {       
         const cube = this.object.clone()
 
         const group = new THREE.Group()
+
+        // cube.material.color.setHex(node.color)
         // const objectLOD = new THREE.LOD()
         // objectLOD.addLevel(this.object, 750)
         group.add(cube)
@@ -58,9 +58,9 @@ export default {
     });
   
 
-    const sphereGeometryFar = new THREE.SphereBufferGeometry( 1, 5, 3 );
+    // const sphereGeometryFar = new THREE.SphereBufferGeometry( 1, 5, 3 );
     // const sphereGeometryNear = new THREE.SphereBufferGeometry( 1, 20, 15 );
-    const planeGeometry = new THREE.PlaneBufferGeometry( 2, 2 );
+    // const planeGeometry = new THREE.PlaneBufferGeometry( 2, 2 );
 
     // Declare Graph to be later used for Click handling
     this.Graph = graph(this.$el)
