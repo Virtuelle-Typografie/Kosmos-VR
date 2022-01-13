@@ -15,6 +15,8 @@ import * as THREE from 'three'
 // IMPORTANT TO IMPORT FROM JSM FILESET
 const {CSS3DRenderer, CSS3DObject} = require('three/examples/jsm/renderers/CSS3DRenderer')
 
+import Stats from 'three/examples/jsm/libs/stats.module'
+
 // import { ImprovedNoise } from "three/examples/jsm/math/ImprovedNoise";
 
 import { GUI } from 'dat.gui'
@@ -26,15 +28,17 @@ export default {
   data() {
     return  {
       LAST_CLICKED_NODE : String,
-      Graph: undefined,
+      Graph : undefined,
       object : undefined,
       planeGemetry : new THREE.PlaneBufferGeometry( 2, 2 ),
-      planeMaterial: new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide }),
-      plane: new THREE.Object3D(),
-      objectLOD: new THREE.LOD(),
-      textLOD: new THREE.LOD(),
-      renderDistance: 550,
-      nodes: []
+      planeMaterial : new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide }),
+      plane : new THREE.Object3D(),
+      objectLOD : new THREE.LOD(),
+      textLOD : new THREE.LOD(),
+      renderDistance : 550,
+      nodes : [],
+      empty : new THREE.Object3D(),
+      stats : Stats()
     }
   },
   methods: {
@@ -43,7 +47,8 @@ export default {
     },
     // Gets called every frame
 		render () {
-      this.Graph.renderer().render( this.Graph.scene(), this.Graph.camera());
+      this.stats.update()
+      // this.Graph.renderer().render( this.Graph.scene(), this.Graph.camera());
       // plane.quaternion.copy(camera.quaternion);
 		},
     addModelsToScene () {
@@ -51,6 +56,7 @@ export default {
         this.nodes.push(node)
         const cube = this.object.clone()
         const plane = this.plane.clone()
+        const empty = this.empty.clone()
 
         const group = new THREE.Group()
 
@@ -77,11 +83,12 @@ export default {
         // textElement.position.z += 2
         // const textElement   = new CSS3DObject(nodeEl)
 
+        objectLOD.addLevel(empty, this.renderDistance)
         objectLOD.addLevel(plane, 100)
         objectLOD.addLevel(cube, 99)
         group.add(objectLOD)
 
-        textLOD.addLevel(new THREE.Object3D(), this.renderDistance * 0.66)
+        textLOD.addLevel(empty, this.renderDistance * 0.66)
         textLOD.addLevel(textElement, this.renderDistance * 0.6)
 
         group.add(textLOD)
@@ -149,27 +156,6 @@ export default {
             10000  // ms transition duration
           )
         })
-        .onLinkClick(link => {
-          let linkTarget;
-          if(link.target.id == this.LAST_CLICKED_NODE) {
-            linkTarget = link.source
-          } else {
-            linkTarget = link.target
-          } 
-
-          self.LAST_CLICKED_NODE = linkTarget.id
-          // console.log(linkTarget)
-
-          const distance = 5;
-          const distRatio = 1 + distance / Math.hypot(linkTarget.x, linkTarget.y, linkTarget.z);
-
-          this.Graph.cameraPosition(
-            { x: linkTarget.x * distRatio, y: linkTarget.y * distRatio, z: linkTarget.z * distRatio }, // new position
-            linkTarget, // lookAt ({ x, y, z })
-            10000  // ms transition duration
-          )
-          // console.log(link)
-        })
         .onEngineStop(() => {
           this.overrideCameraSettings()
           this.Graph.renderer().xr.enabled = true;
@@ -185,6 +171,8 @@ export default {
         // this.Graph.scene().background = new THREE.Color( 0x082032 );
 
         this.$el.appendChild( VRButton.createButton( this.Graph.renderer() ) );
+        
+        document.body.appendChild(this.stats.dom)
 
         this.instantiateGUI()
         this.animate()
