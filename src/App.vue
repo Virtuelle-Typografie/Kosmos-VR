@@ -59,10 +59,11 @@ export default {
 
         cube.material.color = color
         cube.material.metalness = 0.5;
-        cube.position.set(0,0,0)
+        cube.position.set(0,2.5,0)
         cube.scale.set(1,1,1)
     
         plane.material.color = color
+        cube.position.set(0,2.5,0)
 
         const objectLOD = new THREE.LOD()
         const textLOD   = new THREE.LOD()
@@ -80,8 +81,8 @@ export default {
         objectLOD.addLevel(cube, 99)
         group.add(objectLOD)
 
-        textLOD.addLevel(new THREE.Object3D(), 720)
-        textLOD.addLevel(textElement, 450)
+        textLOD.addLevel(new THREE.Object3D(), this.renderDistance * 0.66)
+        textLOD.addLevel(textElement, this.renderDistance * 0.6)
 
         group.add(textLOD)
 
@@ -209,7 +210,7 @@ html,body {
 
 .node-label {
   position: absolute;
-  top: 1.5px;
+  top: 0;
   font-family: 'Inter';
   position: absolute;
   font-size: 18px;
