@@ -28,11 +28,12 @@ export default {
       LAST_CLICKED_NODE : String,
       Graph: undefined,
       object : undefined,
-      planeGemetry : new THREE.PlaneBufferGeometry( 1, 1 ),
+      planeGemetry : new THREE.PlaneBufferGeometry( 2, 2 ),
       planeMaterial: new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide }),
       plane: new THREE.Object3D(),
       objectLOD: new THREE.LOD(),
       textLOD: new THREE.LOD(),
+      renderDistance: 1200,
       nodes: []
     }
   },
@@ -88,7 +89,7 @@ export default {
       })
     },
     overrideCameraSettings() {
-      this.Graph.camera().far = 1200
+      this.Graph.camera().far = this.renderDistance
       this.Graph.camera().updateProjectionMatrix()
     },
     instantiateGUI() {
@@ -100,7 +101,7 @@ export default {
     }
   },
   created () {
-    GLTFImporter("11k.glb").then((result) => {
+    GLTFImporter("14k.glb").then((result) => {
       this.object = result
       this.addModelsToScene()
     })
@@ -179,7 +180,7 @@ export default {
         const light = new THREE.AmbientLight( 0x404040, 0.1); // soft white light
         this.Graph.scene().add( light );
 
-        this.Graph.scene().fog = new THREE.Fog(0x000000, 1100, 1250);
+        this.Graph.scene().fog = new THREE.Fog(0x000000, this.renderDistance - 150, this.renderDistance + 50);
         // this.Graph.scene().background = new THREE.Color( 0x082032 );
 
         // console.log(VRButton)
@@ -209,7 +210,7 @@ html,body {
 
 .node-label {
   position: absolute;
-  top: 1px;
+  top: 1.5px;
   font-family: 'Inter';
   position: absolute;
   font-size: 18px;
