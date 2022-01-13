@@ -102,7 +102,7 @@ export default {
       DeviceOrientationEvent.requestPermission()
       .then(response => {
         if (response == 'granted') {
-          window.addEventListener('deviceorientation', (e) => {
+          window.addEventListener('deviceorientation', () => {
             // do something with e
           })
         }
@@ -112,7 +112,7 @@ export default {
       DeviceMotionEvent.requestPermission()
       .then(response => {
         if (response == 'granted') {
-          window.addEventListener('devicemotion', (e) => {
+          window.addEventListener('devicemotion', () => {
             // do something with e
           })
         }
