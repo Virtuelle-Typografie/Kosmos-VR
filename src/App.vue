@@ -32,7 +32,8 @@ export default {
       planeMaterial: new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide }),
       plane: new THREE.Object3D(),
       objectLOD: new THREE.LOD(),
-      textLOD: new THREE.LOD()
+      textLOD: new THREE.LOD(),
+      nodes: []
     }
   },
   methods: {
@@ -42,9 +43,11 @@ export default {
     // Gets called every frame
 		render () {
       this.Graph.renderer().render( this.Graph.scene(), this.Graph.camera());
+      // plane.quaternion.copy(camera.quaternion);
 		},
     addModelsToScene () {
-      this.Graph.nodeThreeObject((node) => {       
+      this.Graph.nodeThreeObject((node) => {     
+        this.nodes.push(node)
         const cube = this.object.clone()
         const plane = this.plane.clone()
 
@@ -56,6 +59,7 @@ export default {
         cube.material.color = color
         cube.material.metalness = 0.5;
         cube.position.set(0,0,0)
+        cube.scale.set(2,2,2)
     
         plane.material.color = color
 
@@ -107,7 +111,7 @@ export default {
       rendererConfig: {
         antialias: false,
         gammaOutput: true,
-        // depth: false
+        // depth: false // causes glitches on winx64
         // powerPreference: "high-performance",
         // precision: "lowp"
       },
