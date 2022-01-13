@@ -22,9 +22,11 @@
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
     "babel-eslint": "^10.1.0",
+    "dat.gui": "^0.7.7",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
     "node-sass": "^7.0.1",
+    "stats.js": "^0.17.0",
     "vue-template-compiler": "^2.6.11"
   },
   "eslintConfig": {

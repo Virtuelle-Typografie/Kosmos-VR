@@ -9,10 +9,16 @@ import NetworkData from './data/network-relations.json'
 
 import GLTFImporter from './utils/GLTFImporter'
 
+// import { fogParsVert, fogVert, fogParsFrag, fogFrag } from "./shader/FogReplace";
+
 import * as THREE from 'three'
 // IMPORTANT TO IMPORT FROM JSM FILESET
-const {CSS3DRenderer, CSS3DObject} = require('three/examples/jsm/renderers/CSS3DRenderer') 
+const {CSS3DRenderer, CSS3DObject} = require('three/examples/jsm/renderers/CSS3DRenderer')
+
+// import { ImprovedNoise } from "three/examples/jsm/math/ImprovedNoise";
+
 import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
+import { GUI } from 'dat.gui'
 
 export default {
   name: 'App',
@@ -72,6 +78,14 @@ export default {
     overrideCameraSettings() {
       this.Graph.camera().far = 1200
       this.Graph.camera().updateProjectionMatrix()
+    },
+    instantiateGUI() {
+      const gui = new GUI()
+      const cubeFolder = gui.addFolder('Cube')
+      cubeFolder.open()
+      const cameraFolder = gui.addFolder('Camera')
+      cameraFolder.add(this.Graph.camera().position, 'z', 0, 10)
+      cameraFolder.open()
     }
   },
   created () {
@@ -92,7 +106,6 @@ export default {
       },
       controlType: "orbit"
     });
-  
 
     // const sphereGeometryFar = new THREE.SphereBufferGeometry( 1, 5, 3 );
     // const sphereGeometryNear = new THREE.SphereBufferGeometry( 1, 20, 15 );
@@ -108,39 +121,6 @@ export default {
         .linkResolution(0)
         .cooldownTicks(0)
         .warmupTicks(60)
-        // .nodeThreeObject(node => {
-        //   const group = new THREE.Group()
-        //   const textLOD = new THREE.LOD()
-        //   const objectLOD = new THREE.LOD()
-
-        //   // Check for root node, to display this in a different shape
-        
-        //   const nodeEl = document.createElement('div');
-        //   nodeEl.textContent = node.text;
-        //   nodeEl.style.color = node.color;
-        //   nodeEl.className = 'node-label';
-        //   const textElement = new CSS2DObject(nodeEl)
-
-        //   textLOD.addLevel(textElement, 200)
-        //   textLOD.addLevel(new THREE.Object3D, 500)
-
-        //   const sphereMaterial = new THREE.MeshBasicMaterial( {color: node.color } );
-        //   const planeMaterial = new THREE.MeshBasicMaterial( { color: node.color, side: THREE.DoubleSide } );
-
-        //   const sphereFar = new THREE.Mesh( sphereGeometryFar, sphereMaterial );
-        //   // const sphereNear = new THREE.Mesh( sphereGeometryNear, sphereMaterial )
-        //   const plane = new THREE.Mesh( planeGeometry, planeMaterial );
-        //   // plane.quaternion.copy(Graph.camera().quaternion);
-
-        //   objectLOD.addLevel(new THREE.Object3D, 750)
-        //   objectLOD.addLevel(plane, 100)
-        //   objectLOD.addLevel(sphereFar, 75)
-
-        //   group.add(textLOD)
-        //   group.add(objectLOD)
-
-        //   return group;
-        // })
         .nodeThreeObjectExtend(false)
         .onNodeClick(node => {
           // Aim at node from outside it
@@ -195,6 +175,8 @@ export default {
         // console.log(VRButton)
         this.$el.appendChild( VRButton.createButton( this.Graph.renderer() ) );
         this.Graph.renderer().xr.enabled = true;
+
+        this.instantiateGUI()
 
         console.log(this.Graph.camera())
     }
