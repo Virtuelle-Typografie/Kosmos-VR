@@ -11,7 +11,7 @@ import GLTFImporter from './utils/GLTFImporter'
 
 import * as THREE from 'three'
 // IMPORTANT TO IMPORT FROM JSM FILESET
-const {CSS2DRenderer/*, CSS2DObject*/} = require('three/examples/jsm/renderers/CSS2DRenderer') 
+const {CSS3DRenderer, CSS3DObject} = require('three/examples/jsm/renderers/CSS3DRenderer') 
 import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
 
 export default {
@@ -23,7 +23,9 @@ export default {
       object : undefined,
       planeGemetry : new THREE.PlaneBufferGeometry( 1, 1 ),
       planeMaterial: new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide }),
-      plane: new THREE.Object3D()
+      plane: new THREE.Object3D(),
+      objectLOD: new THREE.LOD(),
+      textLOD: new THREE.LOD()
     }
   },
   methods: {
@@ -38,17 +40,31 @@ export default {
         color.setStyle(node.color)
 
         cube.material.color = color
-        cube.material.metalness = 0;
+        cube.material.metalness = 0.5;
         cube.position.set(0,0,0)
-
+    
         plane.material.color = color
 
         const objectLOD = new THREE.LOD()
-        
+        const textLOD   = new THREE.LOD()
 
-        objectLOD.addLevel(plane, 200)
-        objectLOD.addLevel(cube, 100)
+        const nodeEl        = document.createElement('div');
+        nodeEl.textContent  = node.text;
+        nodeEl.style.color  = node.color;
+        nodeEl.className    = 'node-label';
+        var textElement = new CSS3DObject(nodeEl);
+        textElement.scale.set(0.02, 0.02, 0.02)
+        // textElement.position.z += 2
+        // const textElement   = new CSS3DObject(nodeEl)
+
+        objectLOD.addLevel(plane, 100)
+        objectLOD.addLevel(cube, 99)
         group.add(objectLOD)
+
+        textLOD.addLevel(new THREE.Object3D(), 600)
+        textLOD.addLevel(textElement, 500)
+
+        group.add(textLOD)
 
         return group;
       })
@@ -59,18 +75,18 @@ export default {
     }
   },
   created () {
-    GLTFImporter("fractal.glb").then((result) => {
+    GLTFImporter("30k.glb").then((result) => {
       this.object = result
       this.addModelsToScene()
     })
   },
   async mounted () {
     var graph = ForceGraph3D({
-      extraRenderers: [ new CSS2DRenderer() ],
+      extraRenderers: [ new CSS3DRenderer() ],
       rendererConfig: {
         antialias: false,
-        gammaOutput: true
-        // depth: false,
+        gammaOutput: true,
+        depth: false
         // powerPreference: "high-performance",
         // precision: "lowp"
       },
@@ -128,7 +144,7 @@ export default {
         .nodeThreeObjectExtend(false)
         .onNodeClick(node => {
           // Aim at node from outside it
-          const distance = 10;
+          const distance = 5;
           const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
 
           // Set last clicked node
@@ -151,7 +167,7 @@ export default {
           self.LAST_CLICKED_NODE = linkTarget.id
           // console.log(linkTarget)
 
-          const distance = 10;
+          const distance = 5;
           const distRatio = 1 + distance / Math.hypot(linkTarget.x, linkTarget.y, linkTarget.z);
 
           this.Graph.cameraPosition(
@@ -200,12 +216,14 @@ html,body {
 }
 
 .node-label {
+  position: absolute;
+  top: 1px;
   font-family: 'Inter';
   position: absolute;
-  font-size: 11px;
+  font-size: 18px;
   padding: .25rem .45rem;
   border-radius: 12px;
-  background-color: rgba(0,0,0,0.5);
+  background-color: rgba(1,1,1,0.5);
   user-select: none;
 }
 </style>
