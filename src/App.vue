@@ -33,7 +33,7 @@ export default {
       plane: new THREE.Object3D(),
       objectLOD: new THREE.LOD(),
       textLOD: new THREE.LOD(),
-      renderDistance: 1200,
+      renderDistance: 900,
       nodes: []
     }
   },
@@ -60,7 +60,7 @@ export default {
         cube.material.color = color
         cube.material.metalness = 0.5;
         cube.position.set(0,0,0)
-        cube.scale.set(2,2,2)
+        cube.scale.set(1,1,1)
     
         plane.material.color = color
 
@@ -80,8 +80,8 @@ export default {
         objectLOD.addLevel(cube, 99)
         group.add(objectLOD)
 
-        textLOD.addLevel(new THREE.Object3D(), 600)
-        textLOD.addLevel(textElement, 500)
+        textLOD.addLevel(new THREE.Object3D(), 720)
+        textLOD.addLevel(textElement, 700)
 
         group.add(textLOD)
 
@@ -101,7 +101,7 @@ export default {
     }
   },
   created () {
-    GLTFImporter("14k.glb").then((result) => {
+    GLTFImporter("anker.glb").then((result) => {
       this.object = result
       this.addModelsToScene()
     })
@@ -183,7 +183,6 @@ export default {
         this.Graph.scene().fog = new THREE.Fog(0x000000, this.renderDistance - 150, this.renderDistance + 50);
         // this.Graph.scene().background = new THREE.Color( 0x082032 );
 
-        // console.log(VRButton)
         this.$el.appendChild( VRButton.createButton( this.Graph.renderer() ) );
 
         this.instantiateGUI()
