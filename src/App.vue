@@ -113,8 +113,8 @@ export default {
         antialias: false,
         gammaOutput: true,
         // depth: false // causes glitches on winx64
-        // powerPreference: "high-performance",
-        // precision: "lowp"
+        powerPreference: "high-performance",
+        precision: "lowp"
       },
       controlType: "orbit"
     });
