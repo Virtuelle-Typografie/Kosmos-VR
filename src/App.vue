@@ -17,8 +17,9 @@ const {CSS3DRenderer, CSS3DObject} = require('three/examples/jsm/renderers/CSS3D
 
 // import { ImprovedNoise } from "three/examples/jsm/math/ImprovedNoise";
 
-import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
 import { GUI } from 'dat.gui'
+
+import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
 
 export default {
   name: 'App',
@@ -35,6 +36,13 @@ export default {
     }
   },
   methods: {
+    animate () {
+      this.Graph.renderer().setAnimationLoop( this.render );
+    },
+    // Gets called every frame
+		render () {
+      this.Graph.renderer().render( this.Graph.scene(), this.Graph.camera());
+		},
     addModelsToScene () {
       this.Graph.nodeThreeObject((node) => {       
         const cube = this.object.clone()
@@ -80,12 +88,11 @@ export default {
       this.Graph.camera().updateProjectionMatrix()
     },
     instantiateGUI() {
-      const gui = new GUI()
-      const cubeFolder = gui.addFolder('Cube')
-      cubeFolder.open()
-      const cameraFolder = gui.addFolder('Camera')
-      cameraFolder.add(this.Graph.camera().position, 'z', 0, 10)
-      cameraFolder.open()
+      var gui = new GUI();
+
+      gui.add( this.Graph.camera().position , 'x', -500, 500 ).step(5)
+      gui.add( this.Graph.camera().position , 'y', -500, 500 ).step(5)
+      gui.add( this.Graph.camera().position , 'z', -500, 500 ).step(5)
     }
   },
   created () {
@@ -159,6 +166,7 @@ export default {
         })
         .onEngineStop(() => {
           this.overrideCameraSettings()
+          this.Graph.renderer().xr.enabled = true;
           console.log("Engine has stopped calculating.")
         })
 
@@ -167,18 +175,16 @@ export default {
         const light = new THREE.AmbientLight( 0x404040, 0.1); // soft white light
         this.Graph.scene().add( light );
 
-        this.Graph.camera().far = 100
-        this.Graph.camera().updateProjectionMatrix();
-
         this.Graph.scene().fog = new THREE.Fog(0x000000, 1100, 1250);
+        this.Graph.scene().background = new THREE.Color( 0x082032 );
 
         // console.log(VRButton)
         this.$el.appendChild( VRButton.createButton( this.Graph.renderer() ) );
-        this.Graph.renderer().xr.enabled = true;
 
         this.instantiateGUI()
+        this.animate()
 
-        console.log(this.Graph.camera())
+        console.log(this.Graph.renderer())
     }
 }
 </script>
