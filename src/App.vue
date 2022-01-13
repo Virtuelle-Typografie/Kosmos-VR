@@ -97,31 +97,10 @@ export default {
       gui.add( this.Graph.camera().position , 'x', -500, 500 ).step(5)
       gui.add( this.Graph.camera().position , 'y', -500, 500 ).step(5)
       gui.add( this.Graph.camera().position , 'z', -500, 500 ).step(5)
-    },
-    requestVRPermissions () {
-      DeviceOrientationEvent.requestPermission()
-      .then(response => {
-        if (response == 'granted') {
-          window.addEventListener('deviceorientation', () => {
-            // do something with e
-          })
-        }
-      })
-      .catch(console.error)
-
-      DeviceMotionEvent.requestPermission()
-      .then(response => {
-        if (response == 'granted') {
-          window.addEventListener('devicemotion', () => {
-            // do something with e
-          })
-        }
-      })
-      .catch(console.error)
     }
   },
   created () {
-    GLTFImporter("95k.glb").then((result) => {
+    GLTFImporter("11k.glb").then((result) => {
       this.object = result
       this.addModelsToScene()
     })
@@ -201,13 +180,12 @@ export default {
         this.Graph.scene().add( light );
 
         this.Graph.scene().fog = new THREE.Fog(0x000000, 1100, 1250);
-        this.Graph.scene().background = new THREE.Color( 0x082032 );
+        // this.Graph.scene().background = new THREE.Color( 0x082032 );
 
         // console.log(VRButton)
         this.$el.appendChild( VRButton.createButton( this.Graph.renderer() ) );
 
         this.instantiateGUI()
-        this.requestVRPermissions()
         this.animate()
 
         console.log(this.Graph.renderer())
