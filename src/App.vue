@@ -110,18 +110,19 @@ export default {
     },
     instantiateGUI() {
       var gui = new GUI();
+
+      var renderSettings = gui.addFolder('Render Settings');
       
-      gui.add( this , 'renderPixelRatio', 1, 4 )
+      renderSettings.add( this , 'renderPixelRatio', 1, 4 )
         .step(1)
         .onChange((value) => {
-          console.log(value);
           this.Graph.renderer().setPixelRatio(value)
-        });
+      });
       
-
-      gui.add( this.Graph.camera().position , 'x', -500, 500 ).step(5)
-      gui.add( this.Graph.camera().position , 'y', -500, 500 ).step(5)
-      gui.add( this.Graph.camera().position , 'z', -500, 500 ).step(5)
+      var cameraSettings = gui.addFolder('Camera Settings');
+      cameraSettings.add( this.Graph.camera().position , 'x', -500, 500 ).step(5)
+      cameraSettings.add( this.Graph.camera().position , 'y', -500, 500 ).step(5)
+      cameraSettings.add( this.Graph.camera().position , 'z', -500, 500 ).step(5)
 
 
     }
@@ -195,8 +196,6 @@ export default {
 
         this.instantiateGUI()
         this.animate()
-
-        console.log(this.Graph.renderer())
     }
 }
 </script>
