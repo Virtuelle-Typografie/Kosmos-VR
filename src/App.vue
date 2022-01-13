@@ -33,7 +33,7 @@ export default {
       plane: new THREE.Object3D(),
       objectLOD: new THREE.LOD(),
       textLOD: new THREE.LOD(),
-      renderDistance: 900,
+      renderDistance: 550,
       nodes: []
     }
   },
@@ -81,7 +81,7 @@ export default {
         group.add(objectLOD)
 
         textLOD.addLevel(new THREE.Object3D(), 720)
-        textLOD.addLevel(textElement, 700)
+        textLOD.addLevel(textElement, 450)
 
         group.add(textLOD)
 
