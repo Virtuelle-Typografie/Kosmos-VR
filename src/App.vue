@@ -107,7 +107,7 @@ export default {
       rendererConfig: {
         antialias: false,
         gammaOutput: true,
-        depth: false
+        // depth: false
         // powerPreference: "high-performance",
         // precision: "lowp"
       },
