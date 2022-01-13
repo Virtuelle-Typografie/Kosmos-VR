@@ -48,7 +48,7 @@ export default {
     // Gets called every frame
 		render () {
       this.stats.update()
-      // this.Graph.renderer().render( this.Graph.scene(), this.Graph.camera());
+      this.Graph.renderer().render( this.Graph.scene(), this.Graph.camera());
       // plane.quaternion.copy(camera.quaternion);
 		},
     addModelsToScene () {
@@ -66,10 +66,10 @@ export default {
         cube.material.color = color
         cube.material.metalness = 0.5;
         cube.position.set(0,2.5,0)
-        cube.scale.set(1,1,1)
+        cube.scale.set(0.4, 0.4, 0.4)
     
         plane.material.color = color
-        cube.position.set(0,2.5,0)
+        cube.position.set(0,0.5,0)
 
         const objectLOD = new THREE.LOD()
         const textLOD   = new THREE.LOD()
@@ -83,14 +83,13 @@ export default {
         // textElement.position.z += 2
         // const textElement   = new CSS3DObject(nodeEl)
 
-        objectLOD.addLevel(empty, this.renderDistance)
+        objectLOD.addLevel(empty, this.renderDistance * 0.95)
         objectLOD.addLevel(plane, 100)
         objectLOD.addLevel(cube, 99)
         group.add(objectLOD)
 
         textLOD.addLevel(empty, this.renderDistance * 0.66)
         textLOD.addLevel(textElement, this.renderDistance * 0.6)
-
         group.add(textLOD)
 
         return group;
