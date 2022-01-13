@@ -48,7 +48,10 @@ export default {
     // Gets called every frame
 		render () {
       this.stats.update()
-      this.Graph.renderer().render( this.Graph.scene(), this.Graph.camera());
+      if(this.Graph.renderer().xr.isPresenting) {
+        this.Graph.renderer().render( this.Graph.scene(), this.Graph.camera());
+      }
+      
       // plane.quaternion.copy(camera.quaternion);
 		},
     addModelsToScene () {
