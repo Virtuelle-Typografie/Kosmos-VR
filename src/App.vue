@@ -35,6 +35,7 @@ export default {
       plane : new THREE.Object3D(),
       objectLOD : new THREE.LOD(),
       textLOD : new THREE.LOD(),
+      renderPixelRatio: 1,
       renderDistance : 550,
       nodes : [],
       empty : new THREE.Object3D(),
@@ -43,6 +44,7 @@ export default {
   },
   methods: {
     animate () {
+      console.log("Animate")
       this.Graph.renderer().setAnimationLoop( this.render );
     },
     // Gets called every frame
@@ -57,9 +59,12 @@ export default {
     addModelsToScene () {
       this.Graph.nodeThreeObject((node) => {     
         this.nodes.push(node)
-        const cube = this.object.clone()
+        const cube =  this.object.clone()
         const plane = this.plane.clone()
         const empty = this.empty.clone()
+
+        plane.matrixAutoUpdate = false
+        empty.matrixAutoUpdate = false
 
         const group = new THREE.Group()
 
@@ -70,6 +75,7 @@ export default {
         cube.material.metalness = 0.5;
         cube.position.set(0,2.5,0)
         cube.scale.set(0.4, 0.4, 0.4)
+        cube.matrixAutoUpdate = false
     
         plane.material.color = color
         cube.position.set(0,0.5,0)
@@ -104,10 +110,20 @@ export default {
     },
     instantiateGUI() {
       var gui = new GUI();
+      
+      gui.add( this , 'renderPixelRatio', 1, 4 )
+        .step(1)
+        .onChange((value) => {
+          console.log(value);
+          this.Graph.renderer().setPixelRatio(value)
+        });
+      
 
       gui.add( this.Graph.camera().position , 'x', -500, 500 ).step(5)
       gui.add( this.Graph.camera().position , 'y', -500, 500 ).step(5)
       gui.add( this.Graph.camera().position , 'z', -500, 500 ).step(5)
+
+
     }
   },
   created () {
@@ -124,7 +140,8 @@ export default {
         gammaOutput: true,
         // depth: false // causes glitches on winx64
         powerPreference: "high-performance",
-        precision: "lowp"
+        precision: "lowp",
+        alpha: false,
       },
       controlType: "orbit"
     });
