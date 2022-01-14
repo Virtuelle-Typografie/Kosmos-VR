@@ -52,8 +52,6 @@ export default {
       this.stats.update()
       if(this.Graph.renderer().xr.isPresenting) {
         this.Graph.renderer().render( this.Graph.scene(), this.Graph.camera());
-
-        console.log(this.Graph.scene())
       }
       
       // plane.quaternion.copy(camera.quaternion);
