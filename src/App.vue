@@ -52,6 +52,8 @@ export default {
       this.stats.update()
       if(this.Graph.renderer().xr.isPresenting) {
         this.Graph.renderer().render( this.Graph.scene(), this.Graph.camera());
+
+        console.log(this.Graph.camera())
       }
       
       // plane.quaternion.copy(camera.quaternion);
@@ -144,7 +146,7 @@ export default {
         precision: "lowp",
         alpha: false,
       },
-      controlType: "orbit"
+      controlType: "fly"
     });
 
     // const sphereGeometryFar = new THREE.SphereBufferGeometry( 1, 5, 3 );
