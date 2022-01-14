@@ -36,7 +36,7 @@ export default {
       objectLOD : new THREE.LOD(),
       textLOD : new THREE.LOD(),
       renderPixelRatio: 1,
-      renderDistance : 550,
+      renderDistance : 950,
       nodes : [],
       empty : new THREE.Object3D(),
       stats : Stats()
