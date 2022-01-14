@@ -53,7 +53,7 @@ export default {
       if(this.Graph.renderer().xr.isPresenting) {
         this.Graph.renderer().render( this.Graph.scene(), this.Graph.camera());
 
-        console.log(this.Graph.camera())
+        // console.log(this.Graph.camera())
       }
       
       // plane.quaternion.copy(camera.quaternion);
