@@ -57,7 +57,10 @@ export default {
     // Gets called every frame
 		render () {
       this.stats.update()
+
+      // When the XR Scene is triggered
       if(this.Graph.renderer().xr.isPresenting) {
+        this.instantiateControllers()
         this.Graph.renderer().render( this.Graph.scene(), this.Graph.camera());
       }
       
@@ -243,7 +246,6 @@ export default {
         document.body.appendChild(this.stats.dom)
 
         this.instantiateGUI()
-        this.instantiateControllers()
         this.animate()
     }
 }
