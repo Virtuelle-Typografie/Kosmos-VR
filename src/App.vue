@@ -22,6 +22,7 @@ import Stats from 'three/examples/jsm/libs/stats.module'
 import { GUI } from 'dat.gui'
 
 import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
+import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory.js';
 
 export default {
   name: 'App',
@@ -36,10 +37,16 @@ export default {
       objectLOD : new THREE.LOD(),
       textLOD : new THREE.LOD(),
       renderPixelRatio: 1,
-      renderDistance : 950,
+      renderDistance : 450,
       nodes : [],
       empty : new THREE.Object3D(),
-      stats : Stats()
+      stats : Stats(),
+      controller: {
+        left: Object,
+        right: Object,
+        controls: Object
+      },
+      raycaster: Object
     }
   },
   methods: {
@@ -125,7 +132,59 @@ export default {
       cameraSettings.add( this.Graph.camera().position , 'z', -500, 500 ).step(5)
 
 
-    }
+    },
+    instantiateControllers () {
+       var controllerModelFactory = new XRControllerModelFactory();
+
+      this.controller.left  = this.Graph.renderer().xr.getController( 0 )
+      this.controller.right = this.Graph.renderer().xr.getController( 1 )
+
+      // get the grip space of the first controller
+      const controllerGripLeft = this.Graph.renderer().xr.getControllerGrip(0);
+      const modelLeft = controllerModelFactory.createControllerModel( controllerGripLeft );
+
+      const controllerGripRight = this.Graph.renderer().xr.getControllerGrip(1)
+      const modelRight = controllerModelFactory.createControllerModel(controllerGripRight)
+
+      controllerGripLeft.add( modelLeft )
+      controllerGripRight.add(modelRight)
+
+      this.controller.left.addEventListener( 'selectstart', this.onSelectStart );
+      this.controller.left.addEventListener( 'selectend',   this.onSelectEnd );
+
+      const geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
+      const line = new THREE.Line( geometry );
+      line.name = 'line';
+			line.scale.z = 5;
+
+      // Adds Lines in front of the controllers to navigate
+      this.controller.left.add(line.clone())
+      this.controller.right.add(line.clone())
+      
+      this.raycaster = new THREE.Raycaster()
+
+
+      this.Graph.scene().add(controllerGripLeft)
+      this.Graph.scene().add(controllerGripRight)
+      this.Graph.scene().add(this.controller.left)
+      this.Graph.scene().add(this.controller.right)
+    },
+    handleClickEvent(node) {
+      // Aim at node from outside it
+      const distance = 5;
+      const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
+
+      // Set last clicked node
+      this.LAST_CLICKED_NODE = node.id
+
+      this.Graph.cameraPosition(
+        { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }, // new position
+        node, // lookAt ({ x, y, z })
+        10000  // ms transition duration
+      )
+    },
+    onSelectStart() {},
+    onSelectEnd(){}
   },
   created () {
     GLTFImporter("anker.glb").then((result) => {
@@ -163,18 +222,7 @@ export default {
         .warmupTicks(60)
         .nodeThreeObjectExtend(false)
         .onNodeClick(node => {
-          // Aim at node from outside it
-          const distance = 5;
-          const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
-
-          // Set last clicked node
-          this.LAST_CLICKED_NODE = node.id
-
-          this.Graph.cameraPosition(
-            { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }, // new position
-            node, // lookAt ({ x, y, z })
-            10000  // ms transition duration
-          )
+          this.handleClickEvent(node)
         })
         .onEngineStop(() => {
           this.overrideCameraSettings()
@@ -195,6 +243,7 @@ export default {
         document.body.appendChild(this.stats.dom)
 
         this.instantiateGUI()
+        this.instantiateControllers()
         this.animate()
     }
 }
