@@ -36,6 +36,9 @@ export default {
       dolly: new THREE.Group(),
       planeGemetry : new THREE.PlaneBufferGeometry( 2, 2 ),
       planeMaterial : new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide }),
+      lineGeometry: new THREE.BufferGeometry(),
+      linePoint: new THREE.Vector3(),
+      lineMaterial: new THREE.LineBasicMaterial({color: 0x5c6e8a}),
       plane : new THREE.Object3D(),
       objectLOD : new THREE.LOD(),
       textLOD : new THREE.LOD(),
@@ -134,8 +137,23 @@ export default {
       })
     },
     addLinksToScene() {
-      this.Graph.linkThreeObject(() => {
-        return new THREE.Object3D()
+      this.Graph.linkThreeObject((node) => {
+        const lineGeometry  = this.lineGeometry.clone()
+        const startPoint    = this.linePoint.clone()
+        const endPoint      = this.linePoint.clone()
+        const lineMaterial  = this.lineMaterial.clone()
+
+        const points = [];
+
+        points.push(startPoint.set(  {x: node.source.x, y: node.source.y, z: node.source.z }  ))
+        points.push(endPoint.set(    {x: node.target.x, y: node.target.y, z: node.target.z }  ))
+
+        const geometry = lineGeometry.setFromPoints(points)
+
+        const line = new THREE.Line( geometry, lineMaterial );
+        line.matrixAutoUpdate = false
+
+        return line
       })
     },
     overrideCameraSettings() {
@@ -370,6 +388,7 @@ export default {
         .cooldownTicks(0)
         .warmupTicks(60)
         .nodeThreeObjectExtend(false)
+        .linkThreeObjectExtend(false)
         .onNodeClick(node => {
           // Set last clicked node
           this.LAST_CLICKED_NODE = node.id
