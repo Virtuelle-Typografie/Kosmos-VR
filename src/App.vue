@@ -32,6 +32,7 @@ export default {
       LAST_CLICKED_NODE : String,
       Graph : undefined,
       object : undefined,
+      scene: Object,
       dolly: new THREE.Group(),
       planeGemetry : new THREE.PlaneBufferGeometry( 2, 2 ),
       planeMaterial : new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide }),
@@ -61,21 +62,22 @@ export default {
       this.instantiateControllers()
 
       // Adding Dolly to the scene — this is mandatory to get the camera moving in VR space
-      this.Graph.scene().add(this.dolly)
-      this.dolly.add(this.Graph.camera())
+      // this.Graph.scene().add(this.dolly)
+      // this.dolly.add(this.Graph.camera())
     
       this.Graph.renderer().setAnimationLoop( this.render );
     },
     // Gets called every frame
 		render () {
-      this.stats.update()
-      this.renderTween()
       // When the XR Scene is triggered
       if(this.Graph.renderer().xr.isPresenting) {
         console.log("VR Mode started")
         // Create VR Scene
         this.Graph.renderer().render( this.Graph.scene(), this.Graph.camera());
       }
+      
+      this.stats.update()
+      this.renderTween()
       // plane.quaternion.copy(camera.quaternion);
 		},
     renderTween () {
