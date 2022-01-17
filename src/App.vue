@@ -9,8 +9,6 @@ import NetworkData from './data/network-relations.json'
 
 import GLTFImporter from './utils/GLTFImporter'
 
-// import VRCameraRail from './utils/VRCameraRail'
-
 // import { fogParsVert, fogVert, fogParsFrag, fogFrag } from "./shader/FogReplace";
 
 import * as THREE from 'three'
@@ -61,6 +59,10 @@ export default {
     animate () {
       console.log("Animate")
       this.instantiateControllers()
+
+      // Adding Dolly to the scene — this is mandatory to get the camera moving in VR space
+      this.Graph.scene().add(this.dolly)
+      this.dolly.add(this.Graph.camera())
     
       this.Graph.renderer().setAnimationLoop( this.render );
     },
@@ -68,21 +70,12 @@ export default {
 		render () {
       this.stats.update()
       this.renderTween()
-
-      var vector = new THREE.Vector3(); 
-      console.log(this.Graph.camera().getWorldDirection(vector))
-
       // When the XR Scene is triggered
       if(this.Graph.renderer().xr.isPresenting) {
-
-        // Adding Dolly to the scene — this is mandatory to get the camera moving in VR space
-        this.Graph.scene().add(this.dolly)
-        this.dolly.add(this.Graph.camera())
-
+        console.log("VR Mode started")
         // Create VR Scene
         this.Graph.renderer().render( this.Graph.scene(), this.Graph.camera());
       }
-      
       // plane.quaternion.copy(camera.quaternion);
 		},
     renderTween () {
