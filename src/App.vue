@@ -195,10 +195,10 @@ export default {
       this.raycaster = new THREE.Raycaster()
 
 
-      this.Graph.scene().add(controllerGripLeft)
-      this.Graph.scene().add(controllerGripRight)
-      this.Graph.scene().add(this.controller.left)
-      this.Graph.scene().add(this.controller.right)
+      this.dolly.add(controllerGripLeft)
+      this.dolly.add(controllerGripRight)
+      this.dolly.add(this.controller.left)
+      this.dolly.add(this.controller.right)
 
       // Set the global VR State
       this.state.VREnabled = true
