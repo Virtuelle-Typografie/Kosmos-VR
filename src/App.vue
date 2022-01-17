@@ -245,7 +245,13 @@ export default {
           console.log("Camera Found")
           cameras.push(node)
         }
+
+        if ( node.isMesh ) {
+            node.matrixAutoUpdate = false;
+        }
       })
+
+      console.log("CameraList: ", cameras)
 
 
       this.nodes = nodesList
@@ -336,9 +342,9 @@ export default {
 
 
       new TWEEN.Tween(camLookAt)
-          .to(finalLookAt, transitionDuration)
-          .easing(TWEEN.Easing.Circular.In)
-          .delay(5000)
+          .to(finalLookAt, transitionDuration * 2)
+          .easing(TWEEN.Easing.Cubic.Out)
+          .delay(transitionDuration)
           .onUpdate(() => {
               var mx = new THREE.Matrix4().lookAt(camLookAt,new THREE.Vector3(0,0,0),new THREE.Vector3(0,1,0));
               var qt = new THREE.Quaternion().setFromRotationMatrix(mx);
@@ -412,6 +418,7 @@ export default {
         this.dolly.add(this.Graph.camera())
         this.Graph.scene().add(this.dolly)
         
+        this.Graph.renderer().setPixelRatio(this.renderPixelRatio)
 
         this.$el.appendChild( VRButton.createButton( this.Graph.renderer() ) );
         
