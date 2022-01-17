@@ -31,6 +31,7 @@ export default {
       LAST_CLICKED_NODE : String,
       Graph : undefined,
       object : undefined,
+      dolly: new THREE.Group(),
       planeGemetry : new THREE.PlaneBufferGeometry( 2, 2 ),
       planeMaterial : new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide }),
       plane : new THREE.Object3D(),
@@ -66,6 +67,12 @@ export default {
 
       // When the XR Scene is triggered
       if(this.Graph.renderer().xr.isPresenting) {
+        
+        // Adding Dolly to the scene — this is mandatory to get the camera moving in VR space
+        this.Graph.scene().add(this.dolly)
+        this.dolly.add(this.Graph.camera())
+
+        // Create VR Scene
         this.Graph.renderer().render( this.Graph.scene(), this.Graph.camera());
       }
       
@@ -190,17 +197,16 @@ export default {
       // Set the global VR State
       this.state.VREnabled = true
     },
-    handleClickEvent(node) {
+    startCameraRail(x, y, z) {
       // Aim at node from outside it
       const distance = 5;
-      const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
+      const distRatio = 1 + distance/Math.hypot(x, y, z);
 
-      // Set last clicked node
-      this.LAST_CLICKED_NODE = node.id
+      console.log("Start Camera Rail to: ", { x: x, y: y, z: z})
 
       this.Graph.cameraPosition(
-        { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio }, // new position
-        node, // lookAt ({ x, y, z })
+        { x: x * distRatio, y: y * distRatio, z: z * distRatio }, // new position
+        { x, y, z }, // lookAt ({ x, y, z })
         10000  // ms transition duration
       )
     },
@@ -221,11 +227,30 @@ export default {
       const controller = event.target;
 
       const intersections = this.getIntersections( controller );
+
       if ( intersections.length > 0 ) {
-
 					const intersection = intersections[ 0 ];
-
 					const object = intersection.object;
+
+          let target
+          let targetVector = new THREE.Vector3()
+
+          intersections.forEach((intersection) => {
+            if(intersection.object.parent.isLOD) {
+              target = intersection.object.parent
+            }
+          }) 
+
+          // Get absolute Position of selected "NODE" object
+          targetVector = target.getWorldPosition(targetVector)
+
+
+          this.startCameraRail(
+            targetVector.x, 
+            targetVector.y, 
+            targetVector.z
+          )
+
 					object.material.color.set(0x00FF00)
 
 					// controller.attach( object );
@@ -282,7 +307,9 @@ export default {
         .warmupTicks(60)
         .nodeThreeObjectExtend(false)
         .onNodeClick(node => {
-          this.handleClickEvent(node)
+          // Set last clicked node
+          this.LAST_CLICKED_NODE = node.id
+          this.startCameraRail(node.x, node.y, node.z)
         })
         .onEngineStop(() => {
           this.overrideCameraSettings()
