@@ -59,17 +59,18 @@ export default {
   },
   methods: {
     animate () {
-      window.requestAnimationFrame(this.animate);
       console.log("Animate")
       this.instantiateControllers()
-
-      TWEEN.update();
-
+    
       this.Graph.renderer().setAnimationLoop( this.render );
     },
     // Gets called every frame
 		render () {
       this.stats.update()
+      this.renderTween()
+
+      var vector = new THREE.Vector3(); 
+      console.log(this.Graph.camera().getWorldDirection(vector))
 
       // When the XR Scene is triggered
       if(this.Graph.renderer().xr.isPresenting) {
@@ -84,6 +85,10 @@ export default {
       
       // plane.quaternion.copy(camera.quaternion);
 		},
+    renderTween () {
+      window.requestAnimationFrame(this.renderTween);
+      TWEEN.update();
+    },
     addModelsToScene () {
       this.Graph.nodeThreeObject((node) => {     
         const cube =  this.object.clone()
@@ -194,7 +199,7 @@ export default {
       
       this.raycaster = new THREE.Raycaster()
 
-
+      // Adds controller to the dolly so that the controllers will be moved with the camera assigned to it
       this.dolly.add(controllerGripLeft)
       this.dolly.add(controllerGripRight)
       this.dolly.add(this.controller.left)
@@ -250,7 +255,7 @@ export default {
           // Get absolute Position of selected "NODE" object
           targetVector = target.getWorldPosition(targetVector)
 
-          const distance = 5;
+          const distance = 15;
           const distRatio = 1 + distance/Math.hypot(targetVector.x, targetVector.y, targetVector.z);
 
           this.VRCameraRail(
@@ -288,7 +293,7 @@ export default {
       var vector = new THREE.Vector3(); 
 
       var camPos = Object.assign({}, this.dolly.position);
-      var camLookAt = this.Graph.camera().getWorldDirection(vector)
+      var camLookAt = this.dolly.getWorldDirection(vector)
 
       camLookAt = { x: camLookAt.x, y: camLookAt.y, z: camLookAt.z }
 
@@ -304,14 +309,27 @@ export default {
       new TWEEN.Tween(camPos)
           .to(finalPos, transitionDuration)
           .easing(TWEEN.Easing.Quadratic.Out)
-          .onUpdate(function () {
-              console.log(this.x, this.y, this.z)
+          .onUpdate(() => {
+              this.dolly.position.x = camPos.x
+              this.dolly.position.y = camPos.y
+              this.dolly.position.z = camPos.z
           }).start(); // Face direction in 1/3rd of time
 
-      // new TWEEN.Tween(camLookAt)
-      //     .to(finalLookAt, transitionDuration / 3)
-      //     // .easing(Tween.Easing.Quadratic.Out)
-      //     .onUpdate(setLookAt).start();
+
+      new TWEEN.Tween(camLookAt)
+          .to(finalLookAt, transitionDuration)
+          .easing(TWEEN.Easing.Circular.In)
+          .delay(5000)
+          .onUpdate(() => {
+              var mx = new THREE.Matrix4().lookAt(camLookAt,new THREE.Vector3(0,0,0),new THREE.Vector3(0,1,0));
+              var qt = new THREE.Quaternion().setFromRotationMatrix(mx);
+
+              this.dolly.quaternion.x = qt.x
+              this.dolly.quaternion.y = qt.y
+              this.dolly.quaternion.z = qt.z   
+              this.dolly.quaternion.w = qt.w
+
+          }).start(); // Face direction in 1/3rd of time
 
       }
   },
