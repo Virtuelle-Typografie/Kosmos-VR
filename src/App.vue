@@ -9,9 +9,12 @@ import NetworkData from './data/network-relations.json'
 
 import GLTFImporter from './utils/GLTFImporter'
 
+// import VRCameraRail from './utils/VRCameraRail'
+
 // import { fogParsVert, fogVert, fogParsFrag, fogFrag } from "./shader/FogReplace";
 
 import * as THREE from 'three'
+import * as TWEEN from '@tweenjs/tween.js';
 // IMPORTANT TO IMPORT FROM JSM FILESET
 const {CSS3DRenderer, CSS3DObject} = require('three/examples/jsm/renderers/CSS3DRenderer')
 
@@ -56,8 +59,11 @@ export default {
   },
   methods: {
     animate () {
+      window.requestAnimationFrame(this.animate);
       console.log("Animate")
       this.instantiateControllers()
+
+      TWEEN.update();
 
       this.Graph.renderer().setAnimationLoop( this.render );
     },
@@ -67,7 +73,7 @@ export default {
 
       // When the XR Scene is triggered
       if(this.Graph.renderer().xr.isPresenting) {
-        
+
         // Adding Dolly to the scene — this is mandatory to get the camera moving in VR space
         this.Graph.scene().add(this.dolly)
         this.dolly.add(this.Graph.camera())
@@ -244,11 +250,13 @@ export default {
           // Get absolute Position of selected "NODE" object
           targetVector = target.getWorldPosition(targetVector)
 
+          const distance = 5;
+          const distRatio = 1 + distance/Math.hypot(targetVector.x, targetVector.y, targetVector.z);
 
-          this.startCameraRail(
-            targetVector.x, 
-            targetVector.y, 
-            targetVector.z
+          this.VRCameraRail(
+            { x: targetVector.x * distRatio, y: targetVector.y * distRatio, z: targetVector.z * distRatio },
+            { x: targetVector.x, y: targetVector.y, z: targetVector.z },
+            10000,
           )
 
 					object.material.color.set(0x00FF00)
@@ -269,7 +277,43 @@ export default {
       this.raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( this.tempMatrix );
 
       return this.raycaster.intersectObjects( this.nodes, true );
-    }
+    },
+    VRCameraRail (position, lookAt, transitionDuration) {
+      var finalPos = position;
+      var finalLookAt = lookAt || {
+          x: 0,
+          y: 0,
+          z: 0
+      };
+      var vector = new THREE.Vector3(); 
+
+      var camPos = Object.assign({}, this.dolly.position);
+      var camLookAt = this.Graph.camera().getWorldDirection(vector)
+
+      camLookAt = { x: camLookAt.x, y: camLookAt.y, z: camLookAt.z }
+
+      console.log("campos: ", camPos)
+      console.log("finalpos: ", finalPos)
+      console.log("finallookat: ", finalLookAt)
+      console.log("camlookat: ", camLookAt)
+
+      this.dolly.position.x = finalPos.x
+      this.dolly.position.y = finalPos.y
+      this.dolly.position.z = finalPos.z
+
+      new TWEEN.Tween(camPos)
+          .to(finalPos, transitionDuration)
+          .easing(TWEEN.Easing.Quadratic.Out)
+          .onUpdate(function () {
+              console.log(this.x, this.y, this.z)
+          }).start(); // Face direction in 1/3rd of time
+
+      // new TWEEN.Tween(camLookAt)
+      //     .to(finalLookAt, transitionDuration / 3)
+      //     // .easing(Tween.Easing.Quadratic.Out)
+      //     .onUpdate(setLookAt).start();
+
+      }
   },
   created () {
     GLTFImporter("anker.glb").then((result) => {
