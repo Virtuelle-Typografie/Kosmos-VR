@@ -46,7 +46,11 @@ export default {
         right: Object,
         controls: Object
       },
-      raycaster: Object
+      raycaster: new THREE.Raycaster(),
+      tempMatrix: new THREE.Matrix4(),
+      state: {
+        VREnabled : false
+      }
     }
   },
   methods: {
@@ -61,6 +65,28 @@ export default {
       // When the XR Scene is triggered
       if(this.Graph.renderer().xr.isPresenting) {
         this.instantiateControllers()
+        // INIT STATES OVER
+
+
+        // CALCULATE EVERY FRAME
+        const controller = this.controller.right
+        this.tempMatrix.identity().extractRotation( controller.matrixWorld );
+
+        this.raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
+        this.raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( this.tempMatrix );
+
+        const intersects = this.raycaster.intersectObjects( this.nodes, true );
+
+        if(intersects.length > 0) {
+          console.log("Intersects: ", intersects)
+          
+
+          intersects[0].object.material.color.set(0x00FF00)
+        }
+
+        
+
+
         this.Graph.renderer().render( this.Graph.scene(), this.Graph.camera());
       }
       
@@ -68,7 +94,6 @@ export default {
 		},
     addModelsToScene () {
       this.Graph.nodeThreeObject((node) => {     
-        this.nodes.push(node)
         const cube =  this.object.clone()
         const plane = this.plane.clone()
         const empty = this.empty.clone()
@@ -115,6 +140,8 @@ export default {
         textLOD.addLevel(textElement, this.renderDistance * 0.6)
         group.add(textLOD)
 
+        group.name = 'NODE'
+
         return group;
       })
     },
@@ -141,6 +168,10 @@ export default {
 
     },
     instantiateControllers () {
+      if (this.state.VREnabled) {
+        return;
+      }
+
        var controllerModelFactory = new XRControllerModelFactory();
 
       this.controller.left  = this.Graph.renderer().xr.getController( 0 )
@@ -162,7 +193,7 @@ export default {
       const geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
       const line = new THREE.Line( geometry );
       line.name = 'line';
-			line.scale.z = 5;
+			line.scale.z = 500;
 
       // Adds Lines in front of the controllers to navigate
       this.controller.left.add(line.clone())
@@ -175,6 +206,9 @@ export default {
       this.Graph.scene().add(controllerGripRight)
       this.Graph.scene().add(this.controller.left)
       this.Graph.scene().add(this.controller.right)
+
+      // Set the global VR State
+      this.state.VREnabled = true
     },
     handleClickEvent(node) {
       // Aim at node from outside it
@@ -189,6 +223,16 @@ export default {
         node, // lookAt ({ x, y, z })
         10000  // ms transition duration
       )
+    },
+    generateNodesArray() {
+      let nodesList = []
+      this.Graph.scene().traverse((node) => {
+        if(node.name == 'NODE') {
+          nodesList.push(node)
+        }
+      })
+
+      this.nodes = nodesList
     },
     onSelectStart() {},
     onSelectEnd(){}
@@ -233,6 +277,7 @@ export default {
         })
         .onEngineStop(() => {
           this.overrideCameraSettings()
+          this.generateNodesArray()
           this.Graph.renderer().xr.enabled = true;
           console.log("Engine has stopped calculating.")
         })
