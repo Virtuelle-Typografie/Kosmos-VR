@@ -62,8 +62,8 @@ export default {
       this.instantiateControllers()
 
       // Adding Dolly to the scene — this is mandatory to get the camera moving in VR space
-      // this.Graph.scene().add(this.dolly)
-      // this.dolly.add(this.Graph.camera())
+      this.Graph.scene().add(this.dolly)
+      this.dolly.add(this.Graph.camera())
     
       this.Graph.renderer().setAnimationLoop( this.render );
     },
@@ -191,8 +191,6 @@ export default {
       // Adds Lines in front of the controllers to navigate
       this.controller.left.add(line.clone())
       this.controller.right.add(line.clone())
-      
-      this.raycaster = new THREE.Raycaster()
 
       // Adds controller to the dolly so that the controllers will be moved with the camera assigned to it
       this.dolly.add(controllerGripLeft)
