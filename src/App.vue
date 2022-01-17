@@ -14,7 +14,7 @@ import GLTFImporter from './utils/GLTFImporter'
 import * as THREE from 'three'
 import * as TWEEN from '@tweenjs/tween.js';
 // IMPORTANT TO IMPORT FROM JSM FILESET
-const {CSS3DRenderer, CSS3DObject} = require('three/examples/jsm/renderers/CSS3DRenderer')
+const {/* CSS3DRenderer ,*/ CSS3DObject} = require('three/examples/jsm/renderers/CSS3DRenderer')
 
 import Stats from 'three/examples/jsm/libs/stats.module'
 
@@ -60,10 +60,6 @@ export default {
     animate () {
       console.log("Animate")
       this.instantiateControllers()
-
-      // Adding Dolly to the scene — this is mandatory to get the camera moving in VR space
-      this.Graph.scene().add(this.dolly)
-      this.dolly.add(this.Graph.camera())
     
       this.Graph.renderer().setAnimationLoop( this.render );
     },
@@ -135,6 +131,11 @@ export default {
         group.name = 'NODE'
 
         return group;
+      })
+    },
+    addLinksToScene() {
+      this.Graph.linkThreeObject(() => {
+        return new THREE.Object3D()
       })
     },
     overrideCameraSettings() {
@@ -216,11 +217,18 @@ export default {
     },
     generateNodesArray() {
       let nodesList = []
+      let cameras = []
       this.Graph.scene().traverse((node) => {
         if(node.name == 'NODE') {
           nodesList.push(node)
         }
+
+        if(node.fov) {
+          console.log("Camera Found")
+          cameras.push(node)
+        }
       })
+
 
       this.nodes = nodesList
     },
@@ -330,11 +338,12 @@ export default {
     GLTFImporter("anker.glb").then((result) => {
       this.object = result
       this.addModelsToScene()
+      this.addLinksToScene()
     })
   },
   async mounted () {
     var graph = ForceGraph3D({
-      extraRenderers: [ new CSS3DRenderer() ],
+      // extraRenderers: [ new CSS3DRenderer() ],
       rendererConfig: {
         antialias: false,
         gammaOutput: true,
@@ -379,6 +388,10 @@ export default {
         this.Graph.scene().add( light );
 
         this.Graph.scene().fog = new THREE.Fog(0x000000, this.renderDistance - 150, this.renderDistance + 50);
+
+        // Adding Dolly to the scene — this is mandatory to get the camera moving in VR space
+        this.dolly.add(this.Graph.camera())
+        this.Graph.scene().add(this.dolly)
         
 
         this.$el.appendChild( VRButton.createButton( this.Graph.renderer() ) );
