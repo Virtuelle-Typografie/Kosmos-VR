@@ -395,6 +395,7 @@ export default {
         .warmupTicks(60)
         .nodeThreeObjectExtend(false)
         .linkThreeObjectExtend(false)
+        .linkPositionUpdate(false)
         .onNodeClick(node => {
           // Set last clicked node
           this.LAST_CLICKED_NODE = node.id
