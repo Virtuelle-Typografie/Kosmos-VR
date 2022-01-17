@@ -73,6 +73,10 @@ export default {
         const plane = this.plane.clone()
         const empty = this.empty.clone()
 
+        const material = this.object.material.clone()
+        cube.material = material
+        plane.material = material
+
         plane.matrixAutoUpdate = false
         empty.matrixAutoUpdate = false
 
