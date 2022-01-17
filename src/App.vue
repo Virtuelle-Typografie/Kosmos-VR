@@ -56,6 +56,8 @@ export default {
   methods: {
     animate () {
       console.log("Animate")
+      this.instantiateControllers()
+
       this.Graph.renderer().setAnimationLoop( this.render );
     },
     // Gets called every frame
@@ -64,29 +66,6 @@ export default {
 
       // When the XR Scene is triggered
       if(this.Graph.renderer().xr.isPresenting) {
-        this.instantiateControllers()
-        // INIT STATES OVER
-
-
-        // CALCULATE EVERY FRAME
-        const controller = this.controller.right
-        this.tempMatrix.identity().extractRotation( controller.matrixWorld );
-
-        this.raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
-        this.raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( this.tempMatrix );
-
-        const intersects = this.raycaster.intersectObjects( this.nodes, true );
-
-        if(intersects.length > 0) {
-          console.log("Intersects: ", intersects)
-          
-
-          intersects[0].object.material.color.set(0x00FF00)
-        }
-
-        
-
-
         this.Graph.renderer().render( this.Graph.scene(), this.Graph.camera());
       }
       
@@ -168,14 +147,18 @@ export default {
 
     },
     instantiateControllers () {
-      if (this.state.VREnabled) {
+      if (this.state.VREnabled && !this.Graph.renderer().xr.isPresenting) {
         return;
       }
 
-       var controllerModelFactory = new XRControllerModelFactory();
+      var controllerModelFactory = new XRControllerModelFactory();
 
       this.controller.left  = this.Graph.renderer().xr.getController( 0 )
       this.controller.right = this.Graph.renderer().xr.getController( 1 )
+
+      // Add Eventlisteners for each Controller
+      this.controller.left.addEventListener('selectstart',  this.onSelectStart );
+      this.controller.right.addEventListener('selectstart', this.onSelectStart );
 
       // get the grip space of the first controller
       const controllerGripLeft = this.Graph.renderer().xr.getControllerGrip(0);
@@ -186,9 +169,6 @@ export default {
 
       controllerGripLeft.add( modelLeft )
       controllerGripRight.add(modelRight)
-
-      this.controller.left.addEventListener( 'selectstart', this.onSelectStart );
-      this.controller.left.addEventListener( 'selectend',   this.onSelectEnd );
 
       const geometry = new THREE.BufferGeometry().setFromPoints( [ new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, - 1 ) ] );
       const line = new THREE.Line( geometry );
@@ -234,8 +214,37 @@ export default {
 
       this.nodes = nodesList
     },
-    onSelectStart() {},
-    onSelectEnd(){}
+    onSelectStart(event) {
+      console.log("Button is Pressed")
+      // this.Graph.scene().background = new THREE.Color( 0x082032 );
+      
+      const controller = event.target;
+
+      const intersections = this.getIntersections( controller );
+      if ( intersections.length > 0 ) {
+
+					const intersection = intersections[ 0 ];
+
+					const object = intersection.object;
+					object.material.color.set(0x00FF00)
+
+					// controller.attach( object );
+
+					controller.userData.selected = object;
+				}
+
+    },
+    onSelectEnd(){
+
+    },
+    getIntersections(controller) {
+      this.tempMatrix.identity().extractRotation( controller.matrixWorld );
+
+      this.raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
+      this.raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( this.tempMatrix );
+
+      return this.raycaster.intersectObjects( this.nodes, true );
+    }
   },
   created () {
     GLTFImporter("anker.glb").then((result) => {
@@ -288,7 +297,7 @@ export default {
         this.Graph.scene().add( light );
 
         this.Graph.scene().fog = new THREE.Fog(0x000000, this.renderDistance - 150, this.renderDistance + 50);
-        // this.Graph.scene().background = new THREE.Color( 0x082032 );
+        
 
         this.$el.appendChild( VRButton.createButton( this.Graph.renderer() ) );
         
