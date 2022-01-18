@@ -31,7 +31,7 @@ export default {
     return  {
       LAST_CLICKED_NODE : String,
       Graph : undefined,
-      object : undefined,
+      object : [],
       scene: Object,
       dolly: new THREE.Group(),
       planeGemetry : new THREE.PlaneBufferGeometry( 2, 2 ),
@@ -85,11 +85,15 @@ export default {
     },
     addModelsToScene () {
       this.Graph.nodeThreeObject((node) => {     
-        const cube =  this.object.clone()
+        const index = Math.floor( Math.random() * Object.keys(this.object).length);
+
+        const cubeRef = this.object[Object.keys(this.object)[index]]
+
+        const cube =  cubeRef.clone()
         const plane = this.plane.clone()
         const empty = this.empty.clone()
 
-        const material = this.object.material.clone()
+        const material = cubeRef.material.clone()
         cube.material = material
         plane.material = material
 
@@ -353,8 +357,8 @@ export default {
       }
   },
   created () {
-    GLTFImporter("anker.glb").then((result) => {
-      this.object = result
+    GLTFImporter(["anker1.glb", "anker2.glb", "anker3.glb", "anker4.glb"]).then((results) => {
+      this.object = results
       this.addModelsToScene()
       this.addLinksToScene()
     })

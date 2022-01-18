@@ -14,14 +14,22 @@ const loader = new GLTFLoader()
 // Optional: Provide a DRACOLoader instance to decode compressed mesh data
 const dracoLoader = new DRACOLoader();
 
-export default async function loadGLTF(name) {
+export default async function loadGLTF(models) {
     dracoLoader.setDecoderPath('/examples/js/libs/draco/');
     loader.setDRACOLoader(dracoLoader);
-
     
-    const [model] = await Promise.all([
-        loader.loadAsync('/models/' + name)
+    
+    const [model, model1, model2, model3] = await Promise.all([
+        loader.loadAsync('/models/' + models[0]),
+        loader.loadAsync('/models/' + models[1]),
+        loader.loadAsync('/models/' + models[2]),
+        loader.loadAsync('/models/' + models[3]),
     ]);
 
-    return model.scene.children[0]
+    return {
+        model1: model.scene.children[0],
+        model2: model1.scene.children[0],
+        model3: model2.scene.children[0],
+        model4: model.scene.children[0],
+    }
 }
