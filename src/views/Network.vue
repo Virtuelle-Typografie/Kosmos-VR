@@ -104,11 +104,10 @@ export default {
 
         const group = new THREE.Group()
 
-        const color = cube.material.color.clone()
-        color.setStyle(node.color)
+        const color = new THREE.Color(0xffffff)
 
         cube.material.color = color
-        cube.material.metalness = 0.5;
+        cube.material.metalness = 0.01;
         cube.scale.set(0.4, 0.4, 0.4)
         cube.position.set(0,2.5,-10)
         cube.matrixAutoUpdate = false
@@ -288,7 +287,7 @@ export default {
     },
     onSelectStart(event) {
       console.log("Button is Pressed")
-      // this.Graph.scene().background = new THREE.Color( 0x082032 );
+      
       
       const controller = event.target;
 
@@ -465,6 +464,8 @@ export default {
         
         const light = new THREE.AmbientLight( 0x404040, 0.1); // soft white light
         this.Graph.scene().add( light );
+
+        this.Graph.scene().background = new THREE.Color( 0x000000 );
 
         this.Graph.scene().fog = new THREE.Fog(0x000000, this.renderDistance - 150, this.renderDistance + 50);
 
