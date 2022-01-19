@@ -19,7 +19,7 @@ export default async function loadGLTF(models) {
     loader.setDRACOLoader(dracoLoader);
     
     
-    const [model, model1, model2, model3] = await Promise.all([
+    const [model, model1, model2] = await Promise.all([
         loader.loadAsync('/models/' + models[0]),
         loader.loadAsync('/models/' + models[1]),
         loader.loadAsync('/models/' + models[2]),
