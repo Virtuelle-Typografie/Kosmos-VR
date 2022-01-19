@@ -483,7 +483,9 @@ export default {
 }
 </script>
 
-<style>
+<style lang="scss">
+@import './scss/typography.scss';
+
 html,body {
   margin: 0;
   padding: 0;
