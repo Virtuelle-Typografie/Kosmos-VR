@@ -30,6 +30,7 @@ export default {
       LAST_CLICKED_NODE : String,
       Graph : undefined,
       object : [],
+      initial : true,
       scene: Object,
       dolly: new THREE.Group(),
       planeGemetry : new THREE.PlaneBufferGeometry( 2, 2 ),
@@ -55,9 +56,6 @@ export default {
       tempMatrix: new THREE.Matrix4(),
       state: {
         VREnabled : false
-      },
-      uniforms : {
-          "modelMatrixInverse": { value : new THREE.Matrix4() }
       }
     }
   },
@@ -70,22 +68,18 @@ export default {
     },
     // Gets called every frame
 		render () {
-      // this.textNodes.forEach((node) => {
-      //   var u = node.material.uniforms;
-                
-      //   u.uniformsNeedUpdate = true;
-      // })
-
       // When the XR Scene is triggered
       if(this.Graph.renderer().xr.isPresenting) {
-        console.log("VR Mode started")
+        if(this.initial) {
+            this.initialCameraMovement()
+            this.initial = false
+        }
         // Create VR Scene
         this.Graph.renderer().render( this.Graph.scene(), this.Graph.camera());
       }
       
       this.stats.update()
       this.renderTween()
-      // plane.quaternion.copy(camera.quaternion);
 		},
     renderTween () {
       window.requestAnimationFrame(this.renderTween);
@@ -125,10 +119,6 @@ export default {
         const objectLOD = new THREE.LOD()
         const textLOD   = new THREE.LOD()
 
-        const nodeEl        = document.createElement('div');
-        nodeEl.textContent  = node.text;
-        nodeEl.style.color  = node.color;
-        nodeEl.className    = 'node-label';
         const textElement = new SpriteText(node.text);
         textElement.fontSize = 140
         textElement.fontFace = "Franziska Pro"
@@ -144,24 +134,20 @@ export default {
         textElement.scale.set(textSize.x, textSize.y, textSize.z)
         textElement.name = "textElement"
 
-        // let textureMap = textElement.material.map
-
-        let wordGeometry = new THREE.PlaneBufferGeometry(textSize.x, textSize.y)
-        let wordMaterial =  new THREE.ShaderMaterial({
-          uniforms: this.uniforms,
+        let planeCameraMaterial =  new THREE.ShaderMaterial({
           vertexShader: this.vertexShader(),
+          fragmentShader: this.fragmentShader()
         })
 
-        let mesh = new THREE.Mesh(wordGeometry, wordMaterial)
-        mesh.name = node.text
+        plane.material = planeCameraMaterial
 
-        this.textNodes.push(mesh)
+        this.textNodes.push(textElement)
 
         textLOD.addLevel(empty, this.renderDistance * 0.85)
-        textLOD.addLevel(mesh, this.renderDistance * 0.8)
+        textLOD.addLevel(textElement, this.renderDistance * 0.8)
         group.add(textLOD)
 
-
+        objectLOD.position.set(0, -4, 0)
         objectLOD.addLevel(empty, this.renderDistance * 0.95)
         objectLOD.addLevel(plane, 100)
         objectLOD.addLevel(cube, 99)
@@ -175,32 +161,15 @@ export default {
     vertexShader () {
       return `
           void main() {
-            vec3 look = normalize( cameraPosition - position );
-
-            if( length( look ) == 0.0 ) {
-                look.z = 1.0;
-            }
-
-            vec3 up = vec3( 0.0, 1.0, 0.0 );
-            vec3 right = normalize( cross( up, look ) );
-            up = normalize( cross( look, right ) );
-
-
-            mat4 transformMatrix;
-
-            transformMatrix[0][0] = right.x;
-            transformMatrix[0][1] = right.y;
-            transformMatrix[0][2] = right.z;
-
-            transformMatrix[1][0] = up.x;
-            transformMatrix[1][1] = up.y;
-            transformMatrix[1][2] = up.z;
-
-            transformMatrix[2][0] = look.x;
-            transformMatrix[2][1] = look.y;
-            transformMatrix[2][2] = look.z;
-
-            gl_Position = projectionMatrix * (modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0) + vec4(position.x, position.y, 0.0, 0.0));
+            gl_Position = projectionMatrix * (modelViewMatrix * vec4(0.0, 0.0, position.z, 1.0) + vec4(position.x, position.y, 0.0, 0.0));
+        }
+        `
+    },
+    fragmentShader () {
+      return `
+          void main() {
+            vec3 color;
+            gl_FragColor = vec4( 1.0, 1.0, 1.0, 1.0 );
         }
         `
     },
@@ -351,7 +320,7 @@ export default {
             10000,
           )
 
-					object.material.color.set(0x00FF00)
+					// object.material.color.set(0x00FF00)
 
 					// controller.attach( object );
 
@@ -421,6 +390,24 @@ export default {
 
           }).start(); // Face direction in 1/3rd of time
 
+      },
+      initialCameraMovement () {
+          this.dolly.position.set(0,0,2000)
+
+          let target = this.nodes[0]
+          console.log("Camera Target: ", target)
+          let targetVector = new THREE.Vector3()
+          // Get absolute Position of selected "NODE" object
+          targetVector = target.getWorldPosition(targetVector)
+
+          const distance = 20;
+          const distRatio = 1 + distance/Math.hypot(targetVector.x, targetVector.y, targetVector.z);
+
+          this.VRCameraRail(
+            { x: targetVector.x * distRatio, y: targetVector.y * distRatio, z: targetVector.z * distRatio },
+            { x: targetVector.x, y: targetVector.y, z: targetVector.z },
+            20000,
+          )
       }
   },
   created () {
@@ -471,6 +458,8 @@ export default {
           this.Graph.renderer().xr.enabled = true;
           console.log("Engine has stopped calculating.")
         })
+
+        this.Graph.camera().position.set(0,0,1000)
 
         this.plane = new THREE.Mesh( this.planeGemetry, this.planeMaterial );
         
