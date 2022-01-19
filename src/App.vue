@@ -14,13 +14,11 @@ import GLTFImporter from './utils/GLTFImporter'
 import * as THREE from 'three'
 import * as TWEEN from '@tweenjs/tween.js';
 // IMPORTANT TO IMPORT FROM JSM FILESET
-const {/* CSS3DRenderer ,*/ CSS3DObject} = require('three/examples/jsm/renderers/CSS3DRenderer')
 
-import Stats from 'three/examples/jsm/libs/stats.module'
-
-// import { ImprovedNoise } from "three/examples/jsm/math/ImprovedNoise";
+import SpriteText from 'three-spritetext';
 
 import { GUI } from 'dat.gui'
+import Stats from 'three/examples/jsm/libs/stats.module'
 
 import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
 import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory.js';
@@ -45,6 +43,7 @@ export default {
       renderPixelRatio: 1,
       renderDistance : 450,
       nodes : [],
+      textNodes : [],
       empty : new THREE.Object3D(),
       stats : Stats(),
       controller: {
@@ -68,6 +67,7 @@ export default {
     },
     // Gets called every frame
 		render () {
+      
       // When the XR Scene is triggered
       if(this.Graph.renderer().xr.isPresenting) {
         console.log("VR Mode started")
@@ -107,8 +107,8 @@ export default {
 
         cube.material.color = color
         cube.material.metalness = 0.5;
-        cube.position.set(0,2.5,0)
         cube.scale.set(0.4, 0.4, 0.4)
+        cube.position.set(0,2.5,-10)
         cube.matrixAutoUpdate = false
     
         plane.material.color = color
@@ -121,19 +121,34 @@ export default {
         nodeEl.textContent  = node.text;
         nodeEl.style.color  = node.color;
         nodeEl.className    = 'node-label';
-        var textElement = new CSS3DObject(nodeEl);
-        textElement.scale.set(0.02, 0.02, 0.02)
-        // textElement.position.z += 2
-        // const textElement   = new CSS3DObject(nodeEl)
+        const textElement = new SpriteText(node.text);
+        textElement.fontSize = 140
+        textElement.fontFace = "Franziska Pro"
+        textElement.fontWeight = 500
+        textElement.fontStyle = 'italic'
+
+
+        const textSize = {
+          x: textElement.scale.x / 2,
+          y: textElement.scale.y / 2,
+          z: textElement.scale.z / 2
+        }
+        textElement.scale.set(textSize.x, textSize.y, textSize.z)
+        textElement.name = "textElement"
+
+        // let textureMap = textElement.material.map
+
+        this.textNodes.push(textElement)
+
+        textLOD.addLevel(empty, this.renderDistance * 0.85)
+        textLOD.addLevel(textElement, this.renderDistance * 0.8)
+        group.add(textLOD)
+
 
         objectLOD.addLevel(empty, this.renderDistance * 0.95)
         objectLOD.addLevel(plane, 100)
         objectLOD.addLevel(cube, 99)
         group.add(objectLOD)
-
-        textLOD.addLevel(empty, this.renderDistance * 0.66)
-        textLOD.addLevel(textElement, this.renderDistance * 0.6)
-        group.add(textLOD)
 
         group.name = 'NODE'
 
@@ -226,7 +241,7 @@ export default {
     },
     startCameraRail(x, y, z) {
       // Aim at node from outside it
-      const distance = 5;
+      const distance = 15;
       const distRatio = 1 + distance/Math.hypot(x, y, z);
 
       console.log("Start Camera Rail to: ", { x: x, y: y, z: z})
@@ -278,7 +293,7 @@ export default {
           // Get absolute Position of selected "NODE" object
           targetVector = target.getWorldPosition(targetVector)
 
-          const distance = 15;
+          const distance = 20;
           const distRatio = 1 + distance/Math.hypot(targetVector.x, targetVector.y, targetVector.z);
 
           this.VRCameraRail(
@@ -299,10 +314,13 @@ export default {
 
     },
     getIntersections(controller) {
+      this.raycaster.camera = this.Graph.camera()
       this.tempMatrix.identity().extractRotation( controller.matrixWorld );
 
       this.raycaster.ray.origin.setFromMatrixPosition( controller.matrixWorld );
       this.raycaster.ray.direction.set( 0, 0, - 1 ).applyMatrix4( this.tempMatrix );
+
+      console.log("Objects to intersect against:", this.nodes)
 
       return this.raycaster.intersectObjects( this.nodes, true );
     },
@@ -399,8 +417,8 @@ export default {
           this.startCameraRail(node.x, node.y, node.z)
         })
         .onEngineStop(() => {
-          this.overrideCameraSettings()
           this.generateNodesArray()
+          this.overrideCameraSettings()
           this.Graph.renderer().xr.enabled = true;
           console.log("Engine has stopped calculating.")
         })
