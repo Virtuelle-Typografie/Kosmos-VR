@@ -42,7 +42,7 @@ export default {
       objectLOD : new THREE.LOD(),
       textLOD : new THREE.LOD(),
       renderPixelRatio: 1,
-      renderDistance : 450,
+      renderDistance : 350,
       nodes : [],
       textNodes : [],
       empty : new THREE.Object3D(),
@@ -141,12 +141,11 @@ export default {
 
         this.textNodes.push(textElement)
 
-        textLOD.addLevel(empty, this.renderDistance * 0.85)
-        textLOD.addLevel(textElement, this.renderDistance * 0.8)
+        textLOD.addLevel(empty, this.renderDistance * 1.1)
+        textLOD.addLevel(textElement, this.renderDistance)
         group.add(textLOD)
 
         objectLOD.position.set(0, -4, 0)
-        objectLOD.addLevel(empty, this.renderDistance * 0.95)
         objectLOD.addLevel(plane, 100)
         objectLOD.addLevel(cube, 99)
         group.add(objectLOD)
@@ -280,6 +279,10 @@ export default {
           console.log("Camera Found")
           cameras.push(node)
         }
+
+        if(node.isMesh) {
+          node.matrixAutoUpdate = false
+        }
       })
 
 
@@ -373,20 +376,20 @@ export default {
           }).start(); // Face direction in 1/3rd of time
 
 
-      new TWEEN.Tween(camLookAt)
-          .to(finalLookAt, transitionDuration)
-          .easing(TWEEN.Easing.Circular.In)
-          .delay(5000)
-          .onUpdate(() => {
-              var mx = new THREE.Matrix4().lookAt(camLookAt,new THREE.Vector3(0,0,0),new THREE.Vector3(0,1,0));
-              var qt = new THREE.Quaternion().setFromRotationMatrix(mx);
+      // new TWEEN.Tween(camLookAt)
+      //     .to(finalLookAt, transitionDuration)
+      //     .easing(TWEEN.Easing.Cubic.In)
+      //     .delay(9000)
+      //     .onUpdate(() => {
+      //         var mx = new THREE.Matrix4().lookAt(camLookAt,new THREE.Vector3(0,0,0),new THREE.Vector3(0,1,0));
+      //         var qt = new THREE.Quaternion().setFromRotationMatrix(mx);
 
-              this.dolly.quaternion.x = qt.x
-              this.dolly.quaternion.y = qt.y
-              this.dolly.quaternion.z = qt.z   
-              this.dolly.quaternion.w = qt.w
+      //         this.dolly.quaternion.x = qt.x
+      //         this.dolly.quaternion.y = qt.y
+      //         this.dolly.quaternion.z = qt.z   
+      //         this.dolly.quaternion.w = qt.w
 
-          }).start(); // Face direction in 1/3rd of time
+      //     }).start(); // Face direction in 1/3rd of time
 
       },
       initialCameraMovement () {
