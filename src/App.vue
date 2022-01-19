@@ -57,9 +57,8 @@ export default {
         VREnabled : false
       },
       uniforms : {
-            colorB: {type: 'vec3', value: new THREE.Color(0xACB6E5)},
-            colorA: {type: 'vec3', value: new THREE.Color(0x74ebd5)}
-        }
+          "modelMatrixInverse": { value : new THREE.Matrix4() }
+      }
     }
   },
   methods: {
@@ -71,7 +70,14 @@ export default {
     },
     // Gets called every frame
 		render () {
-      
+      this.textNodes.forEach((node) => {
+        var u = node.material.uniforms;
+        // u.matrixInv.copy( node.matrixWorld ).invert();
+        var inverse = this.dolly.matrixWorld.invert()
+        u.modelMatrixInverse.value = inverse;
+        u.uniformsNeedUpdate = true;
+      })
+
       // When the XR Scene is triggered
       if(this.Graph.renderer().xr.isPresenting) {
         console.log("VR Mode started")
@@ -145,13 +151,13 @@ export default {
         let wordGeometry = new THREE.PlaneBufferGeometry(textSize.x, textSize.y)
         let wordMaterial =  new THREE.ShaderMaterial({
           uniforms: this.uniforms,
-          fragmentShader: this.fragmentShader(),
           vertexShader: this.vertexShader(),
         })
 
         let mesh = new THREE.Mesh(wordGeometry, wordMaterial)
+        mesh.name = node.text
 
-        this.textNodes.push(textElement)
+        this.textNodes.push(mesh)
 
         textLOD.addLevel(empty, this.renderDistance * 0.85)
         textLOD.addLevel(mesh, this.renderDistance * 0.8)
@@ -170,26 +176,35 @@ export default {
     },
     vertexShader () {
       return `
-        varying vec3 vUv; 
+        uniform mat4 modelMatrixInverse;
+        attribute vec3 aPosition;
 
-        void main() {
-          vUv = position; 
+        void main(){
 
-          vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);
-          gl_Position = projectionMatrix * modelViewPosition; 
+            vec4 camLocalPosition = modelMatrixInverse*vec4(cameraPosition, 1);
+            vec3 localUpVector = vec3(0, 1, 0);
+
+            // Create LookAt matrix. (target is cam, from is instance center)
+            vec3 camVec = camLocalPosition.xyz - aPosition;
+
+            vec3 zaxis = normalize(camVec);
+            vec3 xaxis = normalize(cross(localUpVector, zaxis));
+            vec3 yaxis = cross(zaxis, xaxis);
+
+              mat3 lookAtMatrix = mat3(xaxis, yaxis, zaxis);
+
+              // LONG FORM:
+              // mat3 lookAtMatrix = mat3(
+              //   xaxis.x, xaxis.y, xaxis.z,
+              //   yaxis.x, yaxis.y, yaxis.z,
+              //   zaxis.x, zaxis.y, zaxis.z
+              // );
+
+            vec3 transformLocal = lookAtMatrix * position + aPosition;
+
+            gl_Position = projectionMatrix * modelViewMatrix * vec4(transformLocal, 1);
         }
-      `
-    },
-    fragmentShader() {
-      return `
-          uniform vec3 colorA; 
-          uniform vec3 colorB; 
-          varying vec3 vUv;
-
-          void main() {
-            gl_FragColor = vec4(mix(colorA, colorB, vUv.z), 1.0);
-          }
-      `
+        `
     },
     addLinksToScene() {
       this.Graph.linkThreeObject((node) => {
