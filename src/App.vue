@@ -121,10 +121,9 @@ export default {
 
         const textElement = new SpriteText(node.text);
         textElement.fontSize = 140
-        textElement.fontFace = "Franziska Pro"
+        textElement.fontFace = "FranziskaPro"
         textElement.fontWeight = 500
         textElement.fontStyle = 'italic'
-
 
         const textSize = {
           x: textElement.scale.x / 2,
@@ -484,14 +483,16 @@ export default {
 </script>
 
 <style lang="scss">
-@import './scss/typography.scss';
+@import '/scss/typography.scss';
 
 html,body {
   margin: 0;
   padding: 0;
 }
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: 'FranziskaPro';
+  font-weight: bold;
+  font-style: italic;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
