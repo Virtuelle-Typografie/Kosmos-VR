@@ -1,0 +1,46 @@
+diff --git a/node_modules/three-spritetext/dist/three-spritetext.common.js b/node_modules/three-spritetext/dist/three-spritetext.common.js
+index a14a00a..4e20c1a 100644
+--- a/node_modules/three-spritetext/dist/three-spritetext.common.js
++++ b/node_modules/three-spritetext/dist/three-spritetext.common.js
+@@ -220,6 +220,7 @@ var _default = /*#__PURE__*/function (_three$Sprite) {
+     _this._fontSize = 90; // defines text resolution
+ 
+     _this._fontWeight = 'normal';
++    _this._fontStyle = "normal";
+     _this._canvas = document.createElement('canvas');
+     _this._texture = _this.material.map;
+     _this._texture.minFilter = three.LinearFilter;
+@@ -340,6 +341,16 @@ var _default = /*#__PURE__*/function (_three$Sprite) {
+       this._genCanvas();
+     }
+   }, {
++    key: "fontStyle",
++    get: function get() {
++      return this._fontStyle;
++    },
++    set: function set(fontStyle) {
++      this._fontStyle = fontStyle;
++
++      this._genCanvas();
++    }
++  }, {
+     key: "strokeWidth",
+     get: function get() {
+       return this._strokeWidth;
+@@ -385,7 +396,7 @@ var _default = /*#__PURE__*/function (_three$Sprite) {
+       }); // padding in canvas units
+ 
+       var lines = this.text.split('\n');
+-      var font = "".concat(this.fontWeight, " ").concat(this.fontSize, "px ").concat(this.fontFace);
++      var font = "".concat(this.fontWeight, " ").concat(this.fontSize, "px ").concat(this.fontFace).concat(this.fontStyle);
+       ctx.font = font; // measure canvas with appropriate font
+ 
+       var innerWidth = Math.max.apply(Math, _toConsumableArray(lines.map(function (line) {
+@@ -521,6 +532,7 @@ var _default = /*#__PURE__*/function (_three$Sprite) {
+       this.fontFace = source.fontFace;
+       this.fontSize = source.fontSize;
+       this.fontWeight = source.fontWeight;
++      this.fontStyle = source.fontStyle;
+       this.strokeWidth = source.strokeWidth;
+       this.strokeColor = source.strokeColor;
+       return this;
