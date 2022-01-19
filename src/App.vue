@@ -70,13 +70,11 @@ export default {
     },
     // Gets called every frame
 		render () {
-      this.textNodes.forEach((node) => {
-        var u = node.material.uniforms;
-        // u.matrixInv.copy( node.matrixWorld ).invert();
-        var inverse = this.dolly.matrixWorld.invert()
-        u.modelMatrixInverse.value = inverse;
-        u.uniformsNeedUpdate = true;
-      })
+      // this.textNodes.forEach((node) => {
+      //   var u = node.material.uniforms;
+                
+      //   u.uniformsNeedUpdate = true;
+      // })
 
       // When the XR Scene is triggered
       if(this.Graph.renderer().xr.isPresenting) {
@@ -176,33 +174,33 @@ export default {
     },
     vertexShader () {
       return `
-        uniform mat4 modelMatrixInverse;
-        attribute vec3 aPosition;
+          void main() {
+            vec3 look = normalize( cameraPosition - position );
 
-        void main(){
+            if( length( look ) == 0.0 ) {
+                look.z = 1.0;
+            }
 
-            vec4 camLocalPosition = modelMatrixInverse*vec4(cameraPosition, 1);
-            vec3 localUpVector = vec3(0, 1, 0);
+            vec3 up = vec3( 0.0, 1.0, 0.0 );
+            vec3 right = normalize( cross( up, look ) );
+            up = normalize( cross( look, right ) );
 
-            // Create LookAt matrix. (target is cam, from is instance center)
-            vec3 camVec = camLocalPosition.xyz - aPosition;
 
-            vec3 zaxis = normalize(camVec);
-            vec3 xaxis = normalize(cross(localUpVector, zaxis));
-            vec3 yaxis = cross(zaxis, xaxis);
+            mat4 transformMatrix;
 
-              mat3 lookAtMatrix = mat3(xaxis, yaxis, zaxis);
+            transformMatrix[0][0] = right.x;
+            transformMatrix[0][1] = right.y;
+            transformMatrix[0][2] = right.z;
 
-              // LONG FORM:
-              // mat3 lookAtMatrix = mat3(
-              //   xaxis.x, xaxis.y, xaxis.z,
-              //   yaxis.x, yaxis.y, yaxis.z,
-              //   zaxis.x, zaxis.y, zaxis.z
-              // );
+            transformMatrix[1][0] = up.x;
+            transformMatrix[1][1] = up.y;
+            transformMatrix[1][2] = up.z;
 
-            vec3 transformLocal = lookAtMatrix * position + aPosition;
+            transformMatrix[2][0] = look.x;
+            transformMatrix[2][1] = look.y;
+            transformMatrix[2][2] = look.z;
 
-            gl_Position = projectionMatrix * modelViewMatrix * vec4(transformLocal, 1);
+            gl_Position = projectionMatrix * (modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0) + vec4(position.x, position.y, 0.0, 0.0));
         }
         `
     },
