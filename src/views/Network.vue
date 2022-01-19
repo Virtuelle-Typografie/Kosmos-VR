@@ -376,6 +376,8 @@ export default {
           }).start(); // Face direction in 1/3rd of time
 
 
+      // Only for stationary space
+
       // new TWEEN.Tween(camLookAt)
       //     .to(finalLookAt, transitionDuration)
       //     .easing(TWEEN.Easing.Cubic.In)
