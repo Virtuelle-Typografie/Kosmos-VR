@@ -55,7 +55,11 @@ export default {
       tempMatrix: new THREE.Matrix4(),
       state: {
         VREnabled : false
-      }
+      },
+      uniforms : {
+            colorB: {type: 'vec3', value: new THREE.Color(0xACB6E5)},
+            colorA: {type: 'vec3', value: new THREE.Color(0x74ebd5)}
+        }
     }
   },
   methods: {
@@ -138,10 +142,19 @@ export default {
 
         // let textureMap = textElement.material.map
 
+        let wordGeometry = new THREE.PlaneBufferGeometry(textSize.x, textSize.y)
+        let wordMaterial =  new THREE.ShaderMaterial({
+          uniforms: this.uniforms,
+          fragmentShader: this.fragmentShader(),
+          vertexShader: this.vertexShader(),
+        })
+
+        let mesh = new THREE.Mesh(wordGeometry, wordMaterial)
+
         this.textNodes.push(textElement)
 
         textLOD.addLevel(empty, this.renderDistance * 0.85)
-        textLOD.addLevel(textElement, this.renderDistance * 0.8)
+        textLOD.addLevel(mesh, this.renderDistance * 0.8)
         group.add(textLOD)
 
 
@@ -154,6 +167,29 @@ export default {
 
         return group;
       })
+    },
+    vertexShader () {
+      return `
+        varying vec3 vUv; 
+
+        void main() {
+          vUv = position; 
+
+          vec4 modelViewPosition = modelViewMatrix * vec4(position, 1.0);
+          gl_Position = projectionMatrix * modelViewPosition; 
+        }
+      `
+    },
+    fragmentShader() {
+      return `
+          uniform vec3 colorA; 
+          uniform vec3 colorB; 
+          varying vec3 vUv;
+
+          void main() {
+            gl_FragColor = vec4(mix(colorA, colorB, vUv.z), 1.0);
+          }
+      `
     },
     addLinksToScene() {
       this.Graph.linkThreeObject((node) => {
