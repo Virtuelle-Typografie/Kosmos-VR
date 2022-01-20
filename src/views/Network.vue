@@ -72,6 +72,7 @@ export default {
       if(this.Graph.renderer().xr.isPresenting) {
         if(this.initial) {
             this.initialCameraMovement()
+            this.initializeAudio()
             this.initial = false
         }
         // Create VR Scene
@@ -411,6 +412,24 @@ export default {
             { x: targetVector.x, y: targetVector.y, z: targetVector.z },
             20000,
           )
+      },
+      initializeAudio() {
+        const listener = new THREE.AudioListener();
+        this.Graph.camera().add(listener)
+
+        // create a global audio source
+        const sound = new THREE.Audio( listener );
+
+        // load a sound and set it as the Audio object's buffer
+        const audioLoader = new THREE.AudioLoader();
+        audioLoader.load( '/assets/audio/interstellar.ogg', function( buffer ) {
+          sound.setBuffer( buffer );
+          sound.setLoop( true );
+          sound.setVolume( 0.2 );
+          sound.play();
+        });
+
+        console.log("Audio started")
       }
   },
   created () {
