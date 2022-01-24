@@ -1,0 +1,260 @@
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-ThinItalic.eot');
+    src: url('FranziskaPro-ThinItalic.eot?#iefix') format('embedded-opentype'),
+        url('FranziskaPro-ThinItalic.woff2') format('woff2'),
+        url('FranziskaPro-ThinItalic.woff') format('woff'),
+        url('FranziskaPro-ThinItalic.ttf') format('truetype'),
+        url('FranziskaPro-ThinItalic.svg#FranziskaPro-ThinItalic') format('svg');
+    font-weight: 100;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-Thin.eot');
+    src: url('FranziskaPro-Thin.eot?#iefix') format('embedded-opentype'),
+        url('FranziskaPro-Thin.woff2') format('woff2'),
+        url('FranziskaPro-Thin.woff') format('woff'),
+        url('FranziskaPro-Thin.ttf') format('truetype'),
+        url('FranziskaPro-Thin.svg#FranziskaPro-Thin') format('svg');
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro.eot');
+    src: url('FranziskaPro.eot?#iefix') format('embedded-opentype'),
+        url('FranziskaPro.woff2') format('woff2'),
+        url('FranziskaPro.woff') format('woff'),
+        url('FranziskaPro.ttf') format('truetype'),
+        url('FranziskaPro.svg#FranziskaPro') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-Italic.eot');
+    src: url('FranziskaPro-Italic.eot?#iefix') format('embedded-opentype'),
+        url('FranziskaPro-Italic.woff2') format('woff2'),
+        url('FranziskaPro-Italic.woff') format('woff'),
+        url('FranziskaPro-Italic.ttf') format('truetype'),
+        url('FranziskaPro-Italic.svg#FranziskaPro-Italic') format('svg');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro-Book';
+    src: url('FranziskaPro-Book.eot');
+    src: url('FranziskaPro-Book.eot?#iefix') format('embedded-opentype'),
+        url('FranziskaPro-Book.woff2') format('woff2'),
+        url('FranziskaPro-Book.woff') format('woff'),
+        url('FranziskaPro-Book.ttf') format('truetype'),
+        url('FranziskaPro-Book.svg#FranziskaPro-Book') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro-BookItalic';
+    src: url('FranziskaPro-BookItalic.eot');
+    src: url('FranziskaPro-BookItalic.eot?#iefix') format('embedded-opentype'),
+        url('FranziskaPro-BookItalic.woff2') format('woff2'),
+        url('FranziskaPro-BookItalic.woff') format('woff'),
+        url('FranziskaPro-BookItalic.ttf') format('truetype'),
+        url('FranziskaPro-BookItalic.svg#FranziskaPro-BookItalic') format('svg');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-Black.eot');
+    src: url('FranziskaPro-Black.eot?#iefix') format('embedded-opentype'),
+        url('FranziskaPro-Black.woff2') format('woff2'),
+        url('FranziskaPro-Black.woff') format('woff'),
+        url('FranziskaPro-Black.ttf') format('truetype'),
+        url('FranziskaPro-Black.svg#FranziskaPro-Black') format('svg');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-Bold.eot');
+    src: url('FranziskaPro-Bold.eot?#iefix') format('embedded-opentype'),
+        url('FranziskaPro-Bold.woff2') format('woff2'),
+        url('FranziskaPro-Bold.woff') format('woff'),
+        url('FranziskaPro-Bold.ttf') format('truetype'),
+        url('FranziskaPro-Bold.svg#FranziskaPro-Bold') format('svg');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-Demibold.eot');
+    src: url('FranziskaPro-Demibold.eot?#iefix') format('embedded-opentype'),
+        url('FranziskaPro-Demibold.woff2') format('woff2'),
+        url('FranziskaPro-Demibold.woff') format('woff'),
+        url('FranziskaPro-Demibold.ttf') format('truetype'),
+        url('FranziskaPro-Demibold.svg#FranziskaPro-Demibold') format('svg');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-DemiboldItalic.eot');
+    src: url('FranziskaPro-DemiboldItalic.eot?#iefix') format('embedded-opentype'),
+        url('FranziskaPro-DemiboldItalic.woff2') format('woff2'),
+        url('FranziskaPro-DemiboldItalic.woff') format('woff'),
+        url('FranziskaPro-DemiboldItalic.ttf') format('truetype'),
+        url('FranziskaPro-DemiboldItalic.svg#FranziskaPro-DemiboldItalic') format('svg');
+    font-weight: 600;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-Medium.eot');
+    src: url('FranziskaPro-Medium.eot?#iefix') format('embedded-opentype'),
+        url('FranziskaPro-Medium.woff2') format('woff2'),
+        url('FranziskaPro-Medium.woff') format('woff'),
+        url('FranziskaPro-Medium.ttf') format('truetype'),
+        url('FranziskaPro-Medium.svg#FranziskaPro-Medium') format('svg');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-BlackItalic.eot');
+    src: url('FranziskaPro-BlackItalic.eot?#iefix') format('embedded-opentype'),
+        url('FranziskaPro-BlackItalic.woff2') format('woff2'),
+        url('FranziskaPro-BlackItalic.woff') format('woff'),
+        url('FranziskaPro-BlackItalic.ttf') format('truetype'),
+        url('FranziskaPro-BlackItalic.svg#FranziskaPro-BlackItalic') format('svg');
+    font-weight: 900;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-LightItalic.eot');
+    src: url('FranziskaPro-LightItalic.eot?#iefix') format('embedded-opentype'),
+        url('FranziskaPro-LightItalic.woff2') format('woff2'),
+        url('FranziskaPro-LightItalic.woff') format('woff'),
+        url('FranziskaPro-LightItalic.ttf') format('truetype'),
+        url('FranziskaPro-LightItalic.svg#FranziskaPro-LightItalic') format('svg');
+    font-weight: 300;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-Light.eot');
+    src: url('FranziskaPro-Light.eot?#iefix') format('embedded-opentype'),
+        url('FranziskaPro-Light.woff2') format('woff2'),
+        url('FranziskaPro-Light.woff') format('woff'),
+        url('FranziskaPro-Light.ttf') format('truetype'),
+        url('FranziskaPro-Light.svg#FranziskaPro-Light') format('svg');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-MediumItalic.eot');
+    src: url('FranziskaPro-MediumItalic.eot?#iefix') format('embedded-opentype'),
+        url('FranziskaPro-MediumItalic.woff2') format('woff2'),
+        url('FranziskaPro-MediumItalic.woff') format('woff'),
+        url('FranziskaPro-MediumItalic.ttf') format('truetype'),
+        url('FranziskaPro-MediumItalic.svg#FranziskaPro-MediumItalic') format('svg');
+    font-weight: 500;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-ExtraboldItalic.eot');
+    src: url('FranziskaPro-ExtraboldItalic.eot?#iefix') format('embedded-opentype'),
+        url('FranziskaPro-ExtraboldItalic.woff2') format('woff2'),
+        url('FranziskaPro-ExtraboldItalic.woff') format('woff'),
+        url('FranziskaPro-ExtraboldItalic.ttf') format('truetype'),
+        url('FranziskaPro-ExtraboldItalic.svg#FranziskaPro-ExtraboldItalic') format('svg');
+    font-weight: bold;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-Extrabold.eot');
+    src: url('FranziskaPro-Extrabold.eot?#iefix') format('embedded-opentype'),
+        url('FranziskaPro-Extrabold.woff2') format('woff2'),
+        url('FranziskaPro-Extrabold.woff') format('woff'),
+        url('FranziskaPro-Extrabold.ttf') format('truetype'),
+        url('FranziskaPro-Extrabold.svg#FranziskaPro-Extrabold') format('svg');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro-HairlineItalic';
+    src: url('FranziskaPro-HairlineItalic.eot');
+    src: url('FranziskaPro-HairlineItalic.eot?#iefix') format('embedded-opentype'),
+        url('FranziskaPro-HairlineItalic.woff2') format('woff2'),
+        url('FranziskaPro-HairlineItalic.woff') format('woff'),
+        url('FranziskaPro-HairlineItalic.ttf') format('truetype'),
+        url('FranziskaPro-HairlineItalic.svg#FranziskaPro-HairlineItalic') format('svg');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro-Hairline';
+    src: url('FranziskaPro-Hairline.eot');
+    src: url('FranziskaPro-Hairline.eot?#iefix') format('embedded-opentype'),
+        url('FranziskaPro-Hairline.woff2') format('woff2'),
+        url('FranziskaPro-Hairline.woff') format('woff'),
+        url('FranziskaPro-Hairline.ttf') format('truetype'),
+        url('FranziskaPro-Hairline.svg#FranziskaPro-Hairline') format('svg');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-BoldItalic.eot');
+    src: url('FranziskaPro-BoldItalic.eot?#iefix') format('embedded-opentype'),
+        url('FranziskaPro-BoldItalic.woff2') format('woff2'),
+        url('FranziskaPro-BoldItalic.woff') format('woff'),
+        url('FranziskaPro-BoldItalic.ttf') format('truetype'),
+        url('FranziskaPro-BoldItalic.svg#FranziskaPro-BoldItalic') format('svg');
+    font-weight: bold;
+    font-style: italic;
+    font-display: swap;
+}
+

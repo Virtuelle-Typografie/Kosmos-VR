@@ -1,0 +1,180 @@
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-MediumItalic.woff2') format('woff2'),
+        url('FranziskaPro-MediumItalic.woff') format('woff');
+    font-weight: 500;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro.woff2') format('woff2'),
+        url('FranziskaPro.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-Thin.woff2') format('woff2'),
+        url('FranziskaPro-Thin.woff') format('woff');
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-ThinItalic.woff2') format('woff2'),
+        url('FranziskaPro-ThinItalic.woff') format('woff');
+    font-weight: 100;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-BoldItalic.woff2') format('woff2'),
+        url('FranziskaPro-BoldItalic.woff') format('woff');
+    font-weight: bold;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro-BookItalic';
+    src: url('FranziskaPro-BookItalic.woff2') format('woff2'),
+        url('FranziskaPro-BookItalic.woff') format('woff');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-Italic.woff2') format('woff2'),
+        url('FranziskaPro-Italic.woff') format('woff');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro-HairlineItalic';
+    src: url('FranziskaPro-HairlineItalic.woff2') format('woff2'),
+        url('FranziskaPro-HairlineItalic.woff') format('woff');
+    font-weight: normal;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-ExtraboldItalic.woff2') format('woff2'),
+        url('FranziskaPro-ExtraboldItalic.woff') format('woff');
+    font-weight: bold;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-Bold.woff2') format('woff2'),
+        url('FranziskaPro-Bold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-Demibold.woff2') format('woff2'),
+        url('FranziskaPro-Demibold.woff') format('woff');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro-Book';
+    src: url('FranziskaPro-Book.woff2') format('woff2'),
+        url('FranziskaPro-Book.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-Medium.woff2') format('woff2'),
+        url('FranziskaPro-Medium.woff') format('woff');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-Extrabold.woff2') format('woff2'),
+        url('FranziskaPro-Extrabold.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-LightItalic.woff2') format('woff2'),
+        url('FranziskaPro-LightItalic.woff') format('woff');
+    font-weight: 300;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro-Hairline';
+    src: url('FranziskaPro-Hairline.woff2') format('woff2'),
+        url('FranziskaPro-Hairline.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-DemiboldItalic.woff2') format('woff2'),
+        url('FranziskaPro-DemiboldItalic.woff') format('woff');
+    font-weight: 600;
+    font-style: italic;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-Black.woff2') format('woff2'),
+        url('FranziskaPro-Black.woff') format('woff');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-Light.woff2') format('woff2'),
+        url('FranziskaPro-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'FranziskaPro';
+    src: url('FranziskaPro-BlackItalic.woff2') format('woff2'),
+        url('FranziskaPro-BlackItalic.woff') format('woff');
+    font-weight: 900;
+    font-style: italic;
+    font-display: swap;
+}
+
