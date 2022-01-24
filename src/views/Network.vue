@@ -4,6 +4,9 @@
 
 <script>
 
+// Import notes: in this webpack environment it's important to import three submodules
+// from the /jsm/ subfolder
+
 import ForceGraph3D from '3d-force-graph';
 import NetworkData from '../data/network-relations.json'
 
@@ -13,7 +16,6 @@ import GLTFImporter from '../utils/GLTFImporter'
 
 import * as THREE from 'three'
 import * as TWEEN from '@tweenjs/tween.js';
-// IMPORTANT TO IMPORT FROM JSM FILESET
 
 import SpriteText from 'three-spritetext';
 
@@ -24,29 +26,47 @@ import { VRButton } from 'three/examples/jsm/webxr/VRButton.js';
 import { XRControllerModelFactory } from 'three/examples/jsm/webxr/XRControllerModelFactory.js';
 
 export default {
-  name: 'App',
+  name: 'Network',
   data() {
     return  {
-      LAST_CLICKED_NODE : String,
       Graph : undefined,
+      LAST_CLICKED_NODE : String,
       object : [],
       initial : true,
-      scene: Object,
+      THREE: {
+        scene: Object,
+        camera: Object,
+      },
       dolly: new THREE.Group(),
-      planeGemetry : new THREE.PlaneBufferGeometry( 2, 2 ),
-      planeMaterial : new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide }),
-      lineGeometry: new THREE.BufferGeometry(),
-      linePoint: new THREE.Vector3(),
-      lineMaterial: new THREE.LineBasicMaterial({color: 0x5c6e8a}),
-      plane : new THREE.Object3D(),
-      objectLOD : new THREE.LOD(),
-      textLOD : new THREE.LOD(),
-      renderPixelRatio: 1,
-      renderDistance : 350,
       nodes : [],
       textNodes : [],
-      empty : new THREE.Object3D(),
+
+      objectLOD : new THREE.LOD(),
+      textLOD : new THREE.LOD(),
+
+      objectStore : {
+        plane : new THREE.Mesh()
+      },
+      
       stats : Stats(),
+      geometryStore: {
+        empty : new THREE.Object3D(),
+        planeGeometry : new THREE.PlaneGeometry( 1, 1 ),
+        lineGeometry: new THREE.BufferGeometry(),
+        linePoint: new THREE.Vector3(),
+      },
+      materialStore: {
+        planeMaterial : new THREE.ShaderMaterial({
+          vertexShader: this.vertexShader(),
+          fragmentShader: this.fragmentShader(),
+        }),
+        lineMaterial: new THREE.LineBasicMaterial({color: 0x5c6e8a}),
+      },
+      renderSettings: {
+        renderPixelRatio: 1,
+        renderDistance : 350,
+      },
+      // VR-Controllers
       controller: {
         left: Object,
         right: Object,
@@ -93,18 +113,16 @@ export default {
         const cubeRef = this.object[Object.keys(this.object)[index]]
 
         const cube =  cubeRef.clone()
-        const plane = this.plane.clone()
-        const empty = this.empty.clone()
+        const plane = new THREE.Mesh(this.geometryStore.planeGeometry, this.materialStore.planeMaterial)
+        const empty = this.geometryStore.empty.clone()
 
         const material = cubeRef.material.clone()
         cube.material = material
-        plane.material = material
 
-        plane.matrixAutoUpdate = false
+
         empty.matrixAutoUpdate = false
 
         const group = new THREE.Group()
-
         const color = new THREE.Color(0xffffff)
 
         cube.material.color = color
@@ -113,7 +131,6 @@ export default {
         cube.position.set(0,2.5,-10)
         cube.matrixAutoUpdate = false
     
-        plane.material.color = color
         cube.position.set(0,0.5,0)
 
         const objectLOD = new THREE.LOD()
@@ -133,17 +150,10 @@ export default {
         textElement.scale.set(textSize.x, textSize.y, textSize.z)
         textElement.name = "textElement"
 
-        let planeCameraMaterial =  new THREE.ShaderMaterial({
-          vertexShader: this.vertexShader(),
-          fragmentShader: this.fragmentShader()
-        })
-
-        plane.material = planeCameraMaterial
-
         this.textNodes.push(textElement)
 
-        textLOD.addLevel(empty, this.renderDistance * 1.1)
-        textLOD.addLevel(textElement, this.renderDistance)
+        textLOD.addLevel(empty, this.renderSettings.renderDistance * 1.1)
+        textLOD.addLevel(textElement, this.renderSettings.renderDistance)
         group.add(textLOD)
 
         objectLOD.position.set(0, -4, 0)
@@ -173,10 +183,10 @@ export default {
     },
     addLinksToScene() {
       this.Graph.linkThreeObject((node) => {
-        const lineGeometry  = this.lineGeometry.clone()
-        const startPoint    = this.linePoint.clone()
-        const endPoint      = this.linePoint.clone()
-        const lineMaterial  = this.lineMaterial.clone()
+        const lineGeometry  = this.geometryStore.lineGeometry.clone()
+        const startPoint    = this.geometryStore.linePoint.clone()
+        const endPoint      = this.geometryStore.linePoint.clone()
+        const lineMaterial  = this.materialStore.lineMaterial.clone()
 
         const points = [];
 
@@ -192,15 +202,30 @@ export default {
       })
     },
     overrideCameraSettings() {
-      this.Graph.camera().far = this.renderDistance
+      this.Graph.camera().position.set(0,0,1000)
+      this.Graph.camera().far = this.renderSettings.renderDistance
       this.Graph.camera().updateProjectionMatrix()
+    },
+    overrideSceneSettings() {
+      // Adds all scene related objects
+      const light = new THREE.AmbientLight( 0x404040, 0.1); // soft white light
+      this.Graph.scene().add( light );
+      this.Graph.scene().background = new THREE.Color( 0x000000 );
+      this.Graph.scene().fog = new THREE.Fog(0x000000, this.renderSettings.renderDistance - 150, this.renderSettings.renderDistance + 50);
+
+      // Adding Dolly to the scene — this is mandatory to get the camera moving in VR space
+      this.dolly.add(this.Graph.camera())
+      this.Graph.scene().add(this.dolly)
+    },
+    overrideRendererSettings() {
+      this.Graph.renderer().xr.enabled = true;
     },
     instantiateGUI() {
       var gui = new GUI();
 
       var renderSettings = gui.addFolder('Render Settings');
       
-      renderSettings.add( this , 'renderPixelRatio', 1, 4 )
+      renderSettings.add( this.renderSettings , 'renderPixelRatio', 1, 4 )
         .step(1)
         .onChange((value) => {
           this.Graph.renderer().setPixelRatio(value)
@@ -210,8 +235,6 @@ export default {
       cameraSettings.add( this.Graph.camera().position , 'x', -500, 500 ).step(5)
       cameraSettings.add( this.Graph.camera().position , 'y', -500, 500 ).step(5)
       cameraSettings.add( this.Graph.camera().position , 'z', -500, 500 ).step(5)
-
-
     },
     instantiateControllers () {
       if (this.state.VREnabled && !this.Graph.renderer().xr.isPresenting) {
@@ -290,11 +313,12 @@ export default {
       this.nodes = nodesList
     },
     onSelectStart(event) {
+      // This function is triggered if the trigger button on the VR controller is pressed
       console.log("Button is Pressed")
-      
       
       const controller = event.target;
 
+      // returns an array of intersecting objects after pressing the trigger
       const intersections = this.getIntersections( controller );
 
       if ( intersections.length > 0 ) {
@@ -305,6 +329,8 @@ export default {
           let targetVector = new THREE.Vector3()
 
           intersections.forEach((intersection) => {
+            // sets the target to be always the parent element named 'NODE'
+            // this is important to always have the same coordinates for the camera rail
             if(intersection.object.parent.isLOD) {
               target = intersection.object.parent
             }
@@ -435,6 +461,7 @@ export default {
   created () {
     GLTFImporter(["anker1.glb", "anker2.glb", "anker3.glb", "anker4.glb"]).then((results) => {
       console.log(results)
+
       this.object = results
       this.addModelsToScene()
       this.addLinksToScene()
@@ -451,7 +478,7 @@ export default {
         precision: "lowp",
         alpha: false,
       },
-      controlType: "fly"
+      controlType: this.state.VREnabled ? "fly" : "orbit"
     });
 
     // const sphereGeometryFar = new THREE.SphereBufferGeometry( 1, 5, 3 );
@@ -476,33 +503,27 @@ export default {
           this.startCameraRail(node.x, node.y, node.z)
         })
         .onEngineStop(() => {
+          // saves every node into an array to be accessed later
           this.generateNodesArray()
+
           this.overrideCameraSettings()
-          this.Graph.renderer().xr.enabled = true;
+          this.overrideSceneSettings()
+          this.overrideRendererSettings()
+
           console.log("Engine has stopped calculating.")
         })
 
-        this.Graph.camera().position.set(0,0,1000)
-
-        this.plane = new THREE.Mesh( this.planeGemetry, this.planeMaterial );
         
-        const light = new THREE.AmbientLight( 0x404040, 0.1); // soft white light
-        this.Graph.scene().add( light );
-
-        this.Graph.scene().background = new THREE.Color( 0x000000 );
-
-        this.Graph.scene().fog = new THREE.Fog(0x000000, this.renderDistance - 150, this.renderDistance + 50);
-
-        // Adding Dolly to the scene — this is mandatory to get the camera moving in VR space
-        this.dolly.add(this.Graph.camera())
-        this.Graph.scene().add(this.dolly)
-        
-
+        // Displays the VR Button for instanciating the VR Session
         this.$el.appendChild( VRButton.createButton( this.Graph.renderer() ) );
         
+        // Adds the Stats Window to the DOM
         document.body.appendChild(this.stats.dom)
 
+        // Defines the values displayed in the gui
         this.instantiateGUI()
+
+        // Starts the rendering loop
         this.animate()
     }
 }
