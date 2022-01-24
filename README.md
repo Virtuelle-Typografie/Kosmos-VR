@@ -1,4 +1,4 @@
-# 3D-network-vizualisation
+# Kosmos (duden-network-graph)
 
 <img width="2067" alt="grafik" src="https://user-images.githubusercontent.com/6838053/150784503-64d2d623-2b49-413f-841a-7956726dec00.png">
 
